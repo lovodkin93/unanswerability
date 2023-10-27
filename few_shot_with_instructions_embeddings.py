@@ -8,9 +8,7 @@ import gc
 
 import json
 import os
-import openai
 import argparse
-import time
 from multiprocessing import Pool
 from pathlib import Path
 import logging
@@ -20,16 +18,14 @@ logging.basicConfig(level=logging.INFO)
 
 
 
-
-def squad_Passage(full_prompt):
-    return full_prompt.split("Passage:")[-1].strip().split("Question:")[0].strip()
-
-def squad_Question(full_prompt):
-    return full_prompt.split("Question:")[-1].strip().split("Answer:")[0].strip()
-
-
-
 def get_responses_unanswerable_questions_squad(data_path, request_function, prompt_prefix, n_instances, only_hint_prompts, only_adversarial, batch_size, only_cot, only_non_cot, **kwargs):
+    def squad_Passage(full_prompt):
+        return full_prompt.split("Passage:")[-1].strip().split("Question:")[0].strip()
+
+    def squad_Question(full_prompt):
+        return full_prompt.split("Question:")[-1].strip().split("Answer:")[0].strip()
+
+
     if only_cot:
         responses = {"ids":[], "Adversarial-CoT":[], "Pseudo-Adversarial-CoT":[], "Ablation1-CoT":[], "Ablation2-CoT":[], "Answerability-CoT":[], "Passage":[], "Question":[]}
     elif only_non_cot:
@@ -120,16 +116,17 @@ def get_responses_unanswerable_questions_squad(data_path, request_function, prom
 
 
 
-def NQ_Passage(full_prompt):
-    return full_prompt.split("Passage:")[-1].strip().split("Question:")[0].strip()
-
-def NQ_Question(full_prompt):
-    return full_prompt.split("Question:")[-1].strip().split("Answer:")[0].strip()
-
-
 
 
 def get_responses_unanswerable_questions_NQ(data_path, request_function, prompt_prefix, n_instances, only_hint_prompts, only_adversarial, batch_size, only_cot, only_non_cot, **kwargs):
+
+    def NQ_Passage(full_prompt):
+        return full_prompt.split("Passage:")[-1].strip().split("Question:")[0].strip()
+
+    def NQ_Question(full_prompt):
+        return full_prompt.split("Question:")[-1].strip().split("Answer:")[0].strip()
+
+
     # responses = {"ids":[], "annotation_ids":[], "Adversarial":[], "Pseudo-Adversarial":[], "CoT-Adversarial":[], "Answerability":[], "Passage":[], "Question":[]}
     if only_cot:
         responses = {"ids":[], "annotation_ids":[], "Adversarial-CoT":[], "Pseudo-Adversarial-CoT":[], "Ablation1-CoT":[], "Ablation2-CoT":[], "Answerability-CoT":[], "Passage":[], "Question":[]}
@@ -219,15 +216,19 @@ def get_responses_unanswerable_questions_NQ(data_path, request_function, prompt_
     return responses
 
 
-def musique_Context(full_prompt):
-    return full_prompt.split("Context:")[-1].strip().split("Question:")[0].strip()
-
-def musique_Question(full_prompt):
-    return full_prompt.split("Question:")[-1].strip().split("Answer:")[0].strip()
-
-
-
 def get_responses_unanswerable_questions_musique(data_path, request_function, prompt_prefix, n_instances, only_hint_prompts, only_adversarial, batch_size, only_cot, only_non_cot, **kwargs):
+
+
+    def musique_Context(full_prompt):
+        return full_prompt.split("Context:")[-1].strip().split("Question:")[0].strip()
+
+    def musique_Question(full_prompt):
+        return full_prompt.split("Question:")[-1].strip().split("Answer:")[0].strip()
+
+
+
+
+
     if only_cot:
         responses = {"ids":[], "Adversarial-CoT":[], "Pseudo-Adversarial-CoT":[], "Ablation1-CoT":[], "Ablation2-CoT":[], "Answerability-CoT":[], "Context":[], "Question":[]}
     elif only_non_cot:
@@ -314,30 +315,16 @@ def get_responses_unanswerable_questions_musique(data_path, request_function, pr
 
 
 
-def chatGPT_request(content, k_beams, num_return_sequences, **kwargs):
-    time.sleep(15) 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": content}
-        ]
-    )
 
 
-    return response["choices"][0]["message"]["content"]
 
-
-def HF_request(prompts, k_beams, num_return_sequences, tokenizer, model, is_multi_choice, output_max_length, prompt_suffix, return_only_generated_text):
+def HF_request(prompts, k_beams, num_return_sequences, tokenizer, model, output_max_length, prompt_suffix, return_only_generated_text):
     prompts = [f"{p}{prompt_suffix}" for p in prompts]
     input_ids = tokenizer.batch_encode_plus(
         prompts, 
         padding=True,
         truncation=True,
         return_tensors="pt")["input_ids"].to(model.device)
-    # if model.config.model_type in ["t5", "bart", "led"]:
-    #     outputs = model.generate(input_ids, num_return_sequences=num_return_sequences, max_new_tokens=output_max_length, output_scores=True, return_dict_in_generate=True, num_beams=k_beams, early_stopping=True)
-    # else: # decoder-only - replace "max_length" param with max_new_tokens
     outputs = model.generate(input_ids, num_return_sequences=num_return_sequences, max_new_tokens=output_max_length, output_scores=True, output_hidden_states=True, return_dict_in_generate=True, num_beams=k_beams, early_stopping=True)
     outputs_logits = [s.to("cpu") for s in outputs.scores]
     if "decoder_hidden_states" in outputs.keys(): # in the case of encoder-decoder models
@@ -378,14 +365,7 @@ def HF_request(prompts, k_beams, num_return_sequences, tokenizer, model, is_mult
 def get_all_relevant_models(args, model_name):
 
     models_list = list()
-    if model_name == "ChatGPT":
-        if args.openAI_key == None:
-            with open("openAI_api_key/openAI_api_key.txt", "r") as f1:
-                openai.api_key = f1.read()
-        else:
-                openai.api_key = args.openAI_key
-        # models_list.append({"output_subdir":"chatGPT", "request_function":chatGPT_request, "kwargs":dict()})
-        return {"output_subdir":"chatGPT", "request_function":chatGPT_request, "kwargs":dict()}
+
 
     if model_name == "Flan-UL2":
         tokenizer_UL2 = AutoTokenizer.from_pretrained("google/flan-ul2", model_max_length=args.model_max_length)
@@ -478,21 +458,21 @@ def get_all_relevant_datasets(args):
     data_list = list()
     if "squad" in args.datasets:
         if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad, "is_multi_choice":False})
+            data_list.append({"type": "adversarial", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad})
         if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad, "is_multi_choice":False})
+            data_list.append({"type": "control_group", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad})
 
     if "NQ" in args.datasets:
         if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ, "is_multi_choice":False})
+            data_list.append({"type": "adversarial", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ})
         if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ, "is_multi_choice":False})
+            data_list.append({"type": "control_group", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ})
 
     if "musique" in args.datasets:
         if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique, "is_multi_choice":False})
+            data_list.append({"type": "adversarial", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique})
         if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique, "is_multi_choice":False})
+            data_list.append({"type": "control_group", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique})
 
     return data_list
 
@@ -539,17 +519,18 @@ def main(args):
                         num_return_sequences = k_beams if args.num_return_sequences == None else args.num_return_sequences
                         print(f"model: {model['output_subdir']} data: {dataset['data_name']} type: {dataset['type']} variant: {p_variant} icl_examples_variant: {icl_variant} k_beams: {k_beams}")
                         
-                        create_dir([outdir_path, model['output_subdir'], "few_shot_with_instructions", f"k_beams_{k_beams}_num_return_seq_{num_return_sequences}", p_variant])
-
-
                         if args.all_instances:
                             outdir_suffix = "_all"
                         elif args.unfiltered_instances:
                             outdir_suffix = "_unfiltered"
                         else:
                             outdir_suffix = ""
-                        curr_outdir = os.path.join(outdir_path, model['output_subdir'], "few_shot_with_instructions", f"k_beams_{k_beams}_num_return_seq_{num_return_sequences}", p_variant, f"{dataset['type']}_{dataset['data_name']}_embeddings_icl_examples_v{icl_variant}{outdir_suffix}_k_beams_{k_beams}_num_return_seq_{num_return_sequences}.pt")
-                        
+
+                        curr_outdir = os.path.join(outdir_path, model['output_subdir'], "few_shot_with_instructions", f"k_beams_{k_beams}_num_return_seq_{num_return_sequences}", p_variant, f"icl_examples_v{icl_variant}")
+                        path = Path(curr_outdir)
+                        path.mkdir(parents=True, exist_ok=True)
+                        curr_outdir = os.path.join(curr_outdir, f"{dataset['type']}_{dataset['data_name']}_embeddings_{outdir_suffix}_k_beams_{k_beams}_num_return_seq_{num_return_sequences}.pt")
+ 
                         if os.path.exists(curr_outdir):
                             print(f"{curr_outdir} exists! skipping...")
                             continue
@@ -564,9 +545,9 @@ def main(args):
                         print(f"data loaded is: {data_adversarial_path}")
 
                         if model['kwargs']:
-                            responses = dataset['get_data_function'](data_path=data_adversarial_path, request_function=model['request_function'], prompt_prefix="", output_max_length=args.output_max_length, n_instances=args.n_instances, k_beams = k_beams, batch_size=args.batch_size, num_return_sequences=num_return_sequences, only_hint_prompts=args.only_hint_prompts, only_adversarial=args.only_adversarial, tokenizer=model['kwargs']['tokenizer'], model=model['kwargs']['model'], prompt_suffix=model['kwargs']['prompt_suffix'], is_multi_choice=dataset["is_multi_choice"], return_only_generated_text=args.return_only_generated_text, only_cot=args.only_cot, only_non_cot=args.only_non_cot)
+                            responses = dataset['get_data_function'](data_path=data_adversarial_path, request_function=model['request_function'], prompt_prefix="", output_max_length=args.output_max_length, n_instances=args.n_instances, k_beams = k_beams, batch_size=args.batch_size, num_return_sequences=num_return_sequences, only_hint_prompts=args.only_hint_prompts, only_adversarial=args.only_adversarial, tokenizer=model['kwargs']['tokenizer'], model=model['kwargs']['model'], prompt_suffix=model['kwargs']['prompt_suffix'], return_only_generated_text=args.return_only_generated_text, only_cot=args.only_cot, only_non_cot=args.only_non_cot)
                         else:
-                            responses = dataset['get_data_function'](data_path=data_adversarial_path, request_function=model['request_function'], n_instances=args.n_instances, only_hint_prompts=args.only_hint_prompts, only_adversarial=args.only_adversarial, prompt_prefix="", is_multi_choice=dataset["is_multi_choice"], only_cot=args.only_cot, only_non_cot=args.only_non_cot)
+                            responses = dataset['get_data_function'](data_path=data_adversarial_path, request_function=model['request_function'], n_instances=args.n_instances, only_hint_prompts=args.only_hint_prompts, only_adversarial=args.only_adversarial, prompt_prefix="", only_cot=args.only_cot, only_non_cot=args.only_non_cot)
                         
                         
                         torch.save(responses, curr_outdir) # and to load it: loaded_dict = torch.load(curr_outdir)
@@ -577,10 +558,8 @@ def main(args):
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description="")
-    argparser.add_argument("--ChatGPT", action='store_true', default=False, help="send requests to ChatGPT.")
-    argparser.add_argument('--openAI-key', type=str, default=None, help='API key of OpenAI.')
     argparser.add_argument('--outdir', type=str, default=None, help='outdir to save results')
-    argparser.add_argument("--models", nargs='+', type=str, default=["Flan-T5-small"], help="which models to send requests to. any from: Flan-UL2, Flan-T5-xxl, OPT, Flan-T5-small, OPT-1-3B and ChatGPT")
+    argparser.add_argument("--models", nargs='+', type=str, default=["Flan-T5-small"], help="which models to send requests to. any from: Flan-UL2, Flan-T5-xxl, OPT, Flan-T5-small, and OPT-1-3B.")
     argparser.add_argument("--adversarial", action='store_true', default=False, help="send adversarial requests.")
     argparser.add_argument("--control-group", action='store_true', default=False, help="send control group request.")
     argparser.add_argument("--datasets", nargs='+', type=str, default=["squad"], help="which datasets to work on. any from: squad, NQ, musique")
