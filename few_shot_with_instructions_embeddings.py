@@ -16,9 +16,7 @@ from constants import *
 # Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)
 
-
-
-def get_responses_unanswerable_questions_squad(data_path, args, **kwargs):
+def get_responses_unanswerable_questions_squad(data_path, p_variant, icl_variant, data_type, args, **kwargs):
 
     def squad_Passage(full_prompt):
         return full_prompt.split("Passage:")[-1].strip().split("Question:")[0].strip()
@@ -36,18 +34,16 @@ def get_responses_unanswerable_questions_squad(data_path, args, **kwargs):
                     "Answerability":[], "Answerability-CoT":[],
                     "Passage":[], "Question":[]}
 
-
     with open(data_path) as f:
         data = json.load(f)
+        data = data[p_variant][f"icl_examples_v{icl_variant}"][data_type]
     
     if args.n_instances != None:
         data = data[:args.n_instances]
 
-
     # the control-group doesn't have this parameter
     if "Unanswerablity-Reason" in data[0].keys():
         responses["Unanswerablity-Reason"] = []
-
 
     n_batches = int(np.ceil(len(data) / batch_size))
     for batch_i in tqdm(range(n_batches)):
@@ -91,9 +87,7 @@ def get_responses_unanswerable_questions_squad(data_path, args, **kwargs):
 
     return responses
 
-
-
-def get_responses_unanswerable_questions_NQ(data_path, args, **kwargs):
+def get_responses_unanswerable_questions_NQ(data_path, p_variant, icl_variant, data_type, args, **kwargs):
 
     def NQ_Passage(full_prompt):
         return full_prompt.split("Passage:")[-1].strip().split("Question:")[0].strip()
@@ -113,6 +107,7 @@ def get_responses_unanswerable_questions_NQ(data_path, args, **kwargs):
 
     with open(data_path) as f:
         data = json.load(f)
+        data = data[p_variant][f"icl_examples_v{icl_variant}"][data_type]
     
     if args.n_instances != None:
         data = data[:args.n_instances]
@@ -161,8 +156,7 @@ def get_responses_unanswerable_questions_NQ(data_path, args, **kwargs):
 
     return responses
 
-
-def get_responses_unanswerable_questions_musique(data_path, args, **kwargs):
+def get_responses_unanswerable_questions_musique(data_path, p_variant, icl_variant, data_type, args, **kwargs):
 
 
     def musique_Context(full_prompt):
@@ -170,7 +164,6 @@ def get_responses_unanswerable_questions_musique(data_path, args, **kwargs):
 
     def musique_Question(full_prompt):
         return full_prompt.split("Question:")[-1].strip().split("Answer:")[0].strip()
-
 
     batch_size = args.batch_size
 
@@ -182,9 +175,9 @@ def get_responses_unanswerable_questions_musique(data_path, args, **kwargs):
                     "Answerability":[], "Answerability-CoT":[],
                     "Context":[], "Question":[]}
 
-
     with open(data_path) as f:
         data = json.load(f)
+        data = data[p_variant][f"icl_examples_v{icl_variant}"][data_type]
     
     if args.n_instances != None:
         data = data[:args.n_instances]
@@ -229,11 +222,6 @@ def get_responses_unanswerable_questions_musique(data_path, args, **kwargs):
 
     return responses
 
-
-
-
-
-
 def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suffix, return_only_generated_text):
     prompts = [f"{p}{prompt_suffix}" for p in prompts]
     input_ids = tokenizer.batch_encode_plus(prompts, 
@@ -274,8 +262,7 @@ def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suf
             curr_return_dict["full_logits"] = [curr_logits[batch_i*k_beams] for curr_logits in outputs_logits]
             curr_return_dict["last_hidden_embedding"] = [curr_last_hidden_embedding[batch_i*k_beams] for curr_last_hidden_embedding in outputs_last_hidden_embeddings]
 
-            # when we do beam search/batch size>1 - to remove "excess" padding (make all the beams of the size of the longest output)
-            if torch.any(curr_return_dict["all_outputs_ids"] == 1): # if this is false - it means all beams reach output_max_length and were cut off before </s> was generated.
+            if torch.any(curr_return_dict["all_outputs_ids"] == 1): 
                 curr_max_sentence = int(torch.max((curr_return_dict["all_outputs_ids"] == 1).nonzero(as_tuple=False)[:, 1]))
                 curr_return_dict["all_outputs_ids"] = curr_return_dict["all_outputs_ids"][:,:curr_max_sentence+1]
                 curr_return_dict["full_logits"] = curr_return_dict["full_logits"][:curr_max_sentence]     
@@ -283,7 +270,6 @@ def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suf
                     
         return_dicts.append(curr_return_dict)
     return return_dicts
-
 
 def get_model(args, model_name):
     
@@ -359,32 +345,16 @@ def get_model(args, model_name):
 
     raise Exception(f"Incorrect model passed: {model_name}")
 
-
-
-
 def get_all_relevant_datasets(args):
+    data_function_map = {"squad" : get_responses_unanswerable_questions_squad,
+                         "NQ" : get_responses_unanswerable_questions_NQ,
+                         "musique" : get_responses_unanswerable_questions_musique}
     data_list = list()
-    if "squad" in args.datasets:
-        if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad})
-        if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad})
-
-    if "NQ" in args.datasets:
-        if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ})
-        if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ})
-
-    if "musique" in args.datasets:
-        if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique})
-        if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique})
-
+    if not args.only_answerable_instances:
+        data_list += [{"type": "un-answerable", "data_name":dataset, "get_data_function":data_function_map[dataset]} for dataset in args.datasets]
+    if not args.only_unanswerable_instances:
+        data_list += [{"type": "answerable", "data_name":dataset, "get_data_function":data_function_map[dataset]} for dataset in args.datasets]
     return data_list
-
-
 
 def main(args):
 
@@ -415,32 +385,20 @@ def main(args):
                     for dataset in datasets_list:
                         print(f"model: {model['output_subdir']} data: {dataset['data_name']} type: {dataset['type']} variant: {p_variant} icl_examples_variant: {icl_variant} k_beams: {k_beams}")
                         
-                        if args.all_instances:
-                            outdir_suffix = "_all"
-                        elif args.unfiltered_instances:
-                            outdir_suffix = "_unfiltered"
-                        else:
-                            outdir_suffix = ""
-
                         curr_outdir = os.path.join(outdir_path, model['output_subdir'], "few_shot_with_instructions", f"k_beams_{k_beams}", p_variant, f"icl_examples_v{icl_variant}")
                         path = Path(curr_outdir)
                         path.mkdir(parents=True, exist_ok=True)
-                        curr_outdir = os.path.join(curr_outdir, f"{dataset['type']}_{dataset['data_name']}_embeddings_{outdir_suffix}_k_beams_{k_beams}.pt")
+                        curr_outdir = os.path.join(curr_outdir, f"{dataset['type']}_{dataset['data_name']}_embeddings_k_beams_{k_beams}.pt")
  
                         if os.path.exists(curr_outdir):
                             print(f"{curr_outdir} exists! skipping...")
                             continue
-                        
-                        if args.all_instances:
-                            data_adversarial_path = fr"generated_prompts/all/few_shot_with_instructions/{p_variant}/{dataset['data_name']}_{dataset['type']}_icl_examples_v{icl_variant}_all.json"
-                        elif args.unfiltered_instances:
-                            data_adversarial_path = fr"generated_prompts/unfiltered/few_shot_with_instructions/{p_variant}/{dataset['data_name']}_{dataset['type']}_unfiltered.json"
-                        else:
-                            data_adversarial_path = fr"generated_prompts/filtered/few_shot_with_instructions/{p_variant}/{dataset['data_name']}_{dataset['type']}_filtered.json"
-                        
-                        print(f"data loaded is: {data_adversarial_path}")
 
-                        responses = dataset['get_data_function'](data_path=data_adversarial_path, 
+                        data_path = fr"data/prompts/{dataset['data_name']}/few_shot/test.json"    
+                        responses = dataset['get_data_function'](data_path=data_path, 
+                                                                 p_variant=p_variant,
+                                                                 icl_variant=icl_variant,
+                                                                 data_type=dataset['type'],
                                                                  args=args,
                                                                  output_max_length=args.output_max_length, 
                                                                  k_beams = k_beams, 
@@ -460,21 +418,18 @@ if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description="")
     argparser.add_argument('--outdir', type=str, default=None, help='outdir to save results')
     argparser.add_argument("--models", nargs='+', type=str, default=["Flan-T5-small"], help="which models to send requests to. any from: Flan-UL2, Flan-T5-xxl, OPT, Flan-T5-small, and OPT-1-3B.")
-    argparser.add_argument("--adversarial", action='store_true', default=False, help="send adversarial requests.")
-    argparser.add_argument("--control-group", action='store_true', default=False, help="send control group request.")
     argparser.add_argument("--datasets", nargs='+', type=str, default=["squad"], help="which datasets to work on. any from: squad, NQ, musique")
-    argparser.add_argument("--all-instances", action='store_true', default=False, help="take all the instances of the task.")
-    argparser.add_argument("--unfiltered-instances", action='store_true', default=False, help="take the unfiltered instances of the task.")
     argparser.add_argument("--n-instances", type=int, default=None, help="number of instances to process")
     argparser.add_argument("--k-beams", type=int, default=1, help="beam size (will also be the number of returned outputs to check \"unanswerable\" from)")
     argparser.add_argument("--k-beams-grid-search", type=str, default=None, help="grid search on the k-beams. Will overrun \"--k-beams\". Need to pass as a list (e.g. --k-beams-grid-search [4,5,6])")
-    argparser.add_argument("--num-return-sequences", type=int, default=None, help="number of returned sequences, in which to check if there is unaswerability (if None - will equal k_beam).")
     argparser.add_argument("--prompt-variant", nargs='+', type=str, default=["variant1"], help="prompt variant list (any of variant1, variant2, variant3).")
     argparser.add_argument("--icl-examples-variant", nargs='+', type=str, default=["1"], help="in-context-learning variant list (any of 1, 2, 3).")
     argparser.add_argument("--return-only-generated-text", action='store_true', default=False, help="whether to return only the generated text, without the logits (in cases of OOM)")
     argparser.add_argument("--batch-size", type=int, default=1, help="size of batch.")
     argparser.add_argument("--model-max-length", type=int, default=2048, help="max input length of model (for datasets like NQ where inputs are very long).")
     argparser.add_argument("--output-max-length", type=int, default=100, help="max output length.")
+    argparser.add_argument("--only-answerable-instances", action='store_true', default=False, help="send only the answerable prompts.")
+    argparser.add_argument("--only-unanswerable-instances", action='store_true', default=False, help="send only the un-answerable prompts.")
     argparser.add_argument("--CoT-prompt", action='store_true', default=False, help="whether to also send CoT prompt")
     argparser.add_argument("--binary-answerability-prompt", action='store_true', default=False, help="whether to also send the binary answerability prompt ('Is the question answerable by the passage?').")
     args = argparser.parse_args()
