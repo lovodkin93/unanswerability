@@ -309,7 +309,7 @@ def get_all_relevant_models(args, model_name):
                             device_map='auto',
                             max_memory={0:'10GiB', 'cpu':'300GiB'},
                             torch_dtype=torch.float16).lm_head
-        return {"output_subdir":"UL2_Flan", "request_function":HF_request, "kwargs":dict(tokenizer=tokenizer_UL2, model=model_UL2, lm_head=model_UL2_head, prompt_suffix="")}
+        return {"output_subdir":"Flan-UL2", "request_function":HF_request, "kwargs":dict(tokenizer=tokenizer_UL2, model=model_UL2, lm_head=model_UL2_head, prompt_suffix="")}
 
     if model_name == "Flan-T5-xxl":
         tokenizer_flan_t5_xxl = AutoTokenizer.from_pretrained("google/flan-t5-xxl", model_max_length=args.model_max_length)
@@ -323,11 +323,11 @@ def get_all_relevant_models(args, model_name):
         model_flan_t5_xxl_head = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-xxl",
                             device_map='auto',
                             max_memory={0:'10GiB', 'cpu':'300GiB'}).lm_head
-        return {"output_subdir":"T5_xxl_Flan", "request_function":HF_request, "kwargs":dict(tokenizer=tokenizer_flan_t5_xxl, model=model_flan_t5_xxl, lm_head=model_flan_t5_xxl_head, prompt_suffix="")}
+        return {"output_subdir":"Flan-T5-xxl", "request_function":HF_request, "kwargs":dict(tokenizer=tokenizer_flan_t5_xxl, model=model_flan_t5_xxl, lm_head=model_flan_t5_xxl_head, prompt_suffix="")}
 
 
 
-    if model_name == "OPT":
+    if model_name == "OPT-IML":
 
         tokenizer_OPT = AutoTokenizer.from_pretrained("facebook/opt-iml-max-30b", model_max_length=args.model_max_length, padding_side='left')
         # max_memory_dict = {0:'10GiB', 1:'40GiB'}
@@ -340,7 +340,7 @@ def get_all_relevant_models(args, model_name):
                 max_memory=max_memory_dict,
                 torch_dtype=torch.float16)
         # AVIVSL: add the lm_head of OPT_IML!
-        return {"output_subdir":"OPT", "request_function":HF_request, "kwargs":dict(tokenizer=tokenizer_OPT, model=model_OPT, prompt_suffix="\n Answer:")}
+        return {"output_subdir":"OPT-IML", "request_function":HF_request, "kwargs":dict(tokenizer=tokenizer_OPT, model=model_OPT, prompt_suffix="\n Answer:")}
 
 
     if model_name == "OPT-1-3B":
@@ -508,7 +508,7 @@ if __name__ == '__main__':
     argparser.add_argument("--ChatGPT", action='store_true', default=False, help="send requests to ChatGPT.")
     argparser.add_argument('--openAI-key', type=str, default=None, help='API key of OpenAI.')
     argparser.add_argument('--outdir', type=str, default=None, help='outdir to save results')
-    argparser.add_argument("--models", nargs='+', type=str, default=["Flan-T5-small"], help="which models to send requests to. any from: Flan-UL2, Flan-T5-xxl, OPT, Flan-T5-small, OPT-1-3B and ChatGPT")
+    argparser.add_argument("--models", nargs='+', type=str, default=["Flan-T5-small"], help="which models to send requests to. any from: Flan-UL2, Flan-T5-xxl, OPT-IML, Flan-T5-small, OPT-1-3B and ChatGPT")
     argparser.add_argument("--adversarial", action='store_true', default=False, help="send adversarial requests.")
     argparser.add_argument("--control-group", action='store_true', default=False, help="send control group request.")
     argparser.add_argument("--datasets", nargs='+', type=str, default=["squad"], help="which datasets to work on. any from: squad, NQ, musique")

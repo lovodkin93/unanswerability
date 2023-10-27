@@ -16,12 +16,12 @@ QA_TASK_METRICS_MAP={'exact' : 'EM (all)',
 
 
 def get_model_name(indir):
-    if "UL2_Flan" in indir:
-        curr_model = "UL2_Flan"
-    elif "T5_xxl_Flan" in indir:
-        curr_model = "T5_xxl_Flan"
-    elif "OPT" in indir:
-        curr_model = "OPT"
+    if "Flan-UL2" in indir:
+        curr_model = "Flan-UL2"
+    elif "Flan-T5-xxl" in indir:
+        curr_model = "Flan-T5-xxl"
+    elif "OPT-IML" in indir:
+        curr_model = "OPT-IML"
     else:
         raise Exception(f"curr model not found in indir: {indir}")
     return curr_model

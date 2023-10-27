@@ -36,10 +36,10 @@ def adapt_hidden_embeddings(instance, embedding_type):
 
 
 def get_model_name(indir):
-    if "UL2_Flan" in indir:
-        curr_model = "UL2_Flan"
-    elif "T5_xxl_Flan" in indir:
-        curr_model = "T5_xxl_Flan"
+    if "Flan-UL2" in indir:
+        curr_model = "Flan-UL2"
+    elif "Flan-T5-xxl" in indir:
+        curr_model = "Flan-T5-xxl"
     elif "OPT" in indir:
         curr_model = "OPT"
     else:

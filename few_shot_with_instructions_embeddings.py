@@ -1,18 +1,16 @@
-from accelerate import init_empty_weights, infer_auto_device_map
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForCausalLM, AutoConfig
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForCausalLM
 import numpy as np
 from tqdm import tqdm
 import torch
 from datetime import datetime
 import gc
-
 import json
 import os
 import argparse
-from multiprocessing import Pool
 from pathlib import Path
 import logging
 from constants import *
+from post_processing.pt_to_benchmarks_evaluate_format import main as pt_to_evaluate_format_converter
 # Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)
 
@@ -27,12 +25,12 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, icl_variant
     batch_size = args.batch_size
 
     responses = {"ids":[], 
-                    "Adversarial":[], "Adversarial-CoT":[],
-                    "Pseudo-Adversarial":[], "Pseudo-Adversarial-CoT":[],
-                    "Ablation1":[], "Ablation1-CoT":[],
-                    "Ablation2":[], "Ablation2-CoT":[],
-                    "Answerability":[], "Answerability-CoT":[],
-                    "Passage":[], "Question":[]}
+                 "Adversarial":[], "Adversarial-CoT":[],
+                 "Pseudo-Adversarial":[], "Pseudo-Adversarial-CoT":[],
+                 "Ablation1":[], "Ablation1-CoT":[],
+                 "Ablation2":[], "Ablation2-CoT":[],
+                 "Answerability":[], "Answerability-CoT":[],
+                 "Passage":[], "Question":[]}
 
     with open(data_path) as f:
         data = json.load(f)
@@ -98,12 +96,12 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, icl_variant, d
     batch_size = args.batch_size
 
     responses = {"ids":[], "annotation_ids":[], 
-                    "Adversarial":[], "Adversarial-CoT":[],
-                    "Pseudo-Adversarial":[], "Pseudo-Adversarial-CoT":[],
-                    "Ablation1":[], "Ablation1-CoT":[],
-                    "Ablation2":[], "Ablation2-CoT":[],
-                    "Answerability":[], "Answerability-CoT":[],
-                    "Passage":[], "Question":[]}
+                 "Adversarial":[], "Adversarial-CoT":[],
+                 "Pseudo-Adversarial":[], "Pseudo-Adversarial-CoT":[],
+                 "Ablation1":[], "Ablation1-CoT":[],
+                 "Ablation2":[], "Ablation2-CoT":[],
+                 "Answerability":[], "Answerability-CoT":[],
+                 "Passage":[], "Question":[]}
 
     with open(data_path) as f:
         data = json.load(f)
@@ -137,7 +135,6 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, icl_variant, d
             responses["Ablation1-CoT"].extend([""]*batch_size)
             responses["Ablation2-CoT"].extend([""]*batch_size)
 
-
         # Binary Answerability prompts ("Is it answerable?")
         if args.binary_answerability_prompt:
             responses["Answerability"].extend(HF_request([sample['Answerability'] for sample in curr_data], **kwargs))
@@ -150,14 +147,12 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, icl_variant, d
             responses["Answerability"].extend([""]*batch_size)
             responses["Answerability-CoT"].extend([""]*batch_size)
 
-
         responses["Passage"].extend([NQ_Passage(sample['Adversarial']) for sample in curr_data])
         responses["Question"].extend([NQ_Question(sample['Adversarial']) for sample in curr_data])
 
     return responses
 
 def get_responses_unanswerable_questions_musique(data_path, p_variant, icl_variant, data_type, args, **kwargs):
-
 
     def musique_Context(full_prompt):
         return full_prompt.split("Context:")[-1].strip().split("Question:")[0].strip()
@@ -168,12 +163,12 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, icl_varia
     batch_size = args.batch_size
 
     responses = {"ids":[], 
-                    "Adversarial":[], "Adversarial-CoT":[],
-                    "Pseudo-Adversarial":[], "Pseudo-Adversarial-CoT":[],
-                    "Ablation1":[], "Ablation1-CoT":[],
-                    "Ablation2":[], "Ablation2-CoT":[],
-                    "Answerability":[], "Answerability-CoT":[],
-                    "Context":[], "Question":[]}
+                 "Adversarial":[], "Adversarial-CoT":[],
+                 "Pseudo-Adversarial":[], "Pseudo-Adversarial-CoT":[],
+                 "Ablation1":[], "Ablation1-CoT":[],
+                 "Ablation2":[], "Ablation2-CoT":[],
+                 "Answerability":[], "Answerability-CoT":[],
+                 "Context":[], "Question":[]}
 
     with open(data_path) as f:
         data = json.load(f)
@@ -239,9 +234,9 @@ def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suf
                              early_stopping=True)
     
     outputs_logits = [s.to("cpu") for s in outputs.scores]
-    if "decoder_hidden_states" in outputs.keys(): # in the case of encoder-decoder models
+    if "decoder_hidden_states" in outputs.keys(): # in the case of encoder-decoder models (Flan-T5-xxl and Flan-UL2)
         outputs_last_hidden_embeddings = [s[-1][:,-1,:].to("cpu") for s in outputs.decoder_hidden_states]
-    else: # in the case of decoder-only models
+    else: # in the case of decoder-only models (OPT-IML)
         outputs_last_hidden_embeddings = [s[-1][:,-1,:].to("cpu") for s in outputs.hidden_states]
     
     if model.config.model_type in ["t5", "bart", "led"]:
@@ -257,7 +252,6 @@ def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suf
     for batch_i in range(batch_size):
         curr_return_dict = {"outputs":decoded_outputs[batch_i*k_beams:(batch_i+1)*k_beams]}
         if not return_only_generated_text:
-        
             curr_return_dict["all_outputs_ids"] = outputs_sequences[batch_i*k_beams:(batch_i+1)*k_beams]
             curr_return_dict["full_logits"] = [curr_logits[batch_i*k_beams] for curr_logits in outputs_logits]
             curr_return_dict["last_hidden_embedding"] = [curr_last_hidden_embedding[batch_i*k_beams] for curr_last_hidden_embedding in outputs_last_hidden_embeddings]
@@ -267,83 +261,42 @@ def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suf
                 curr_return_dict["all_outputs_ids"] = curr_return_dict["all_outputs_ids"][:,:curr_max_sentence+1]
                 curr_return_dict["full_logits"] = curr_return_dict["full_logits"][:curr_max_sentence]     
                 curr_return_dict["last_hidden_embedding"] = curr_return_dict["last_hidden_embedding"][:curr_max_sentence] 
-                    
         return_dicts.append(curr_return_dict)
     return return_dicts
 
 def get_model(args, model_name):
-    
-    if model_name == "Flan-UL2":
-        tokenizer_UL2 = AutoTokenizer.from_pretrained("google/flan-ul2", model_max_length=args.model_max_length)
-        # max_memory_dict = {0:'20GiB', 1:"40GiB"}
-        # max_memory_dict['cpu'] = '300GiB'
-        max_memory_dict = {gpu_i:f"{MAX_GPU_MEM}GiB" for gpu_i in range(torch.cuda.device_count())}
-        max_memory_dict['cpu'] = f'{MAX_CPU_MEM}GiB'
-        model_UL2 = AutoModelForSeq2SeqLM.from_pretrained("google/flan-ul2",
-                            device_map='auto',
-                            max_memory=max_memory_dict,
-                            torch_dtype=torch.float16)
+    model_map = {"Flan-UL2" : "google/flan-ul2",
+                 "Flan-T5-xxl" : "google/flan-t5-xxl",
+                 "OPT-IML" : "facebook/opt-iml-max-30b"}
 
-        return {"output_subdir":"UL2_Flan", "kwargs":dict(tokenizer=tokenizer_UL2, model=model_UL2, prompt_suffix="")}
+    if not model_name in model_map.keys():
+        raise Exception(f"Incorrect model passed: {model_name}")
 
-    if model_name == "Flan-T5-xxl":
-        tokenizer_flan_t5_xxl = AutoTokenizer.from_pretrained("google/flan-t5-xxl", model_max_length=args.model_max_length)
-        # max_memory_dict = {0:'20GiB', 1:"40GiB"}
-        # max_memory_dict['cpu'] = '300GiB'
-        max_memory_dict = {gpu_i:f"{MAX_GPU_MEM}GiB" for gpu_i in range(torch.cuda.device_count())}
-        max_memory_dict['cpu'] = f'{MAX_CPU_MEM}GiB'
-        model_flan_t5_xxl = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-xxl",
-                            device_map='auto',
-                            max_memory=max_memory_dict)
-        return {"output_subdir":"T5_xxl_Flan", "kwargs":dict(tokenizer=tokenizer_flan_t5_xxl, model=model_flan_t5_xxl, prompt_suffix="")}
+    # max_memory_dict = {0:'20GiB', 1:"40GiB"}
+    # max_memory_dict['cpu'] = '300GiB'
+    max_memory_dict = {gpu_i:f"{MAX_GPU_MEM}GiB" for gpu_i in range(torch.cuda.device_count())}
+    max_memory_dict['cpu'] = f'{MAX_CPU_MEM}GiB'
 
-
-
-    if model_name == "OPT":
-        tokenizer_OPT = AutoTokenizer.from_pretrained("facebook/opt-iml-max-30b", model_max_length=args.model_max_length, padding_side='left')
-        # max_memory_dict = {0:'20GiB', 1:"40GiB"}
-        # max_memory_dict['cpu'] = '300GiB'
-        max_memory_dict = {gpu_i:f"{MAX_GPU_MEM}GiB" for gpu_i in range(torch.cuda.device_count())}
-        max_memory_dict['cpu'] = f'{MAX_CPU_MEM}GiB'
-        model_OPT = AutoModelForCausalLM.from_pretrained(
-                "facebook/opt-iml-max-30b",
-                device_map='auto',
-                max_memory=max_memory_dict,
-                torch_dtype=torch.float16)
-        return {"output_subdir":"OPT", "kwargs":dict(tokenizer=tokenizer_OPT, model=model_OPT, prompt_suffix="\n Answer:")}
-
-
-
-    if model_name == "OPT-1-3B":
-        tokenizer_OPT_1_3B = AutoTokenizer.from_pretrained("facebook/opt-iml-max-1.3b", model_max_length=args.model_max_length, padding_side='left')
-        # max_memory_dict = {0:'20GiB', 1:"40GiB"}
-        # max_memory_dict['cpu'] = '300GiB'
-        max_memory_dict = {gpu_i:f"{MAX_GPU_MEM}GiB" for gpu_i in range(torch.cuda.device_count())}
-        max_memory_dict['cpu'] = f'{MAX_CPU_MEM}GiB'
-        model_OPT_1_3B = AutoModelForCausalLM.from_pretrained(
-                "facebook/opt-iml-max-1.3b",
-                device_map='auto',
-                max_memory=max_memory_dict,
-                torch_dtype=torch.float16)
-        return {"output_subdir":"OPT_1_3B", "kwargs":dict(tokenizer=tokenizer_OPT_1_3B, model=model_OPT_1_3B, prompt_suffix="\n Answer:")} 
-
-
-
-    # for debugging:
-    if model_name == "Flan-T5-small":
-
-        tokenizer_flan_t5_small = AutoTokenizer.from_pretrained("google/flan-t5-small", model_max_length=args.model_max_length)
-        # max_memory_dict = {0:'20GiB', 1:"40GiB"}
-        # max_memory_dict['cpu'] = '300GiB'
-        max_memory_dict = {gpu_i:f"{MAX_GPU_MEM}GiB" for gpu_i in range(torch.cuda.device_count())}
-        max_memory_dict['cpu'] = f'{MAX_CPU_MEM}GiB'
-        model_flan_t5_small = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-small",
-                            device_map='auto',
-                            max_memory=max_memory_dict)
-
-        return {"output_subdir":"flan_t5_small", "kwargs":dict(tokenizer=tokenizer_flan_t5_small, model=model_flan_t5_small, prompt_suffix="")}
-
-    raise Exception(f"Incorrect model passed: {model_name}")
+    if model_name == "OPT-IML":
+        curr_prompt_suffix = "\n Answer:"
+        curr_tokenizer = AutoTokenizer.from_pretrained(model_map[model_name], model_max_length=args.model_max_length, padding_side='left')
+        curr_model = AutoModelForCausalLM.from_pretrained(model_map[model_name],
+                                                          device_map='auto',
+                                                          max_memory=max_memory_dict,
+                                                          torch_dtype=torch.float16)
+    else:
+        curr_prompt_suffix = ""
+        curr_tokenizer = AutoTokenizer.from_pretrained(model_map[model_name], model_max_length=args.model_max_length)
+        if model_name == "Flan-T5-xxl":
+            curr_model = AutoModelForSeq2SeqLM.from_pretrained(model_map[model_name],
+                                                               device_map='auto',
+                                                               max_memory=max_memory_dict)
+        else:
+            curr_model = AutoModelForSeq2SeqLM.from_pretrained(model_map[model_name],
+                                                               device_map='auto',
+                                                               max_memory=max_memory_dict,
+                                                               torch_dtype=torch.float16)            
+    return {"output_subdir" : model_name, "kwargs":dict(tokenizer=curr_tokenizer, model=curr_model, prompt_suffix=curr_prompt_suffix)}
 
 def get_all_relevant_datasets(args):
     data_function_map = {"squad" : get_responses_unanswerable_questions_squad,
@@ -351,19 +304,21 @@ def get_all_relevant_datasets(args):
                          "musique" : get_responses_unanswerable_questions_musique}
     data_list = list()
     if not args.only_answerable_instances:
-        data_list += [{"type": "un-answerable", "data_name":dataset, "get_data_function":data_function_map[dataset]} for dataset in args.datasets]
+        data_list += [{"type": "un-answerable", 
+                       "data_name":dataset, 
+                       "get_data_function":data_function_map[dataset]} for dataset in args.datasets]
+        
     if not args.only_unanswerable_instances:
-        data_list += [{"type": "answerable", "data_name":dataset, "get_data_function":data_function_map[dataset]} for dataset in args.datasets]
+        data_list += [{"type": "answerable", 
+                       "data_name":dataset, 
+                       "get_data_function":data_function_map[dataset]} for dataset in args.datasets]
     return data_list
 
 def main(args):
-
     now = datetime.now()
     now_str = now.strftime("%d-%m-%Y_%H:%M:%S")
     outdir_path = args.outdir if args.outdir else os.path.join("responses_embeddings", "k-beams", now_str)
-    path = Path(outdir_path)
-    path.mkdir(parents=True, exist_ok=True)
-    logging.info(f'saved to: {outdir_path}')
+    logging.info(f'saving to: {outdir_path}')
 
     datasets_list = get_all_relevant_datasets(args)
 
@@ -385,10 +340,11 @@ def main(args):
                     for dataset in datasets_list:
                         print(f"model: {model['output_subdir']} data: {dataset['data_name']} type: {dataset['type']} variant: {p_variant} icl_examples_variant: {icl_variant} k_beams: {k_beams}")
                         
+                        # create directory
                         curr_outdir = os.path.join(outdir_path, model['output_subdir'], "few_shot_with_instructions", f"k_beams_{k_beams}", p_variant, f"icl_examples_v{icl_variant}")
                         path = Path(curr_outdir)
                         path.mkdir(parents=True, exist_ok=True)
-                        curr_outdir = os.path.join(curr_outdir, f"{dataset['type']}_{dataset['data_name']}_embeddings_k_beams_{k_beams}.pt")
+                        curr_outdir = os.path.join(curr_outdir, f"{dataset['type']}_{dataset['data_name']}.pt")
  
                         if os.path.exists(curr_outdir):
                             print(f"{curr_outdir} exists! skipping...")
@@ -410,14 +366,18 @@ def main(args):
                         
                         torch.save(responses, curr_outdir) # and to load it: loaded_dict = torch.load(curr_outdir)
 
+    # if not only_answerable_instances and not only_unanswerable_instances - namely we have both answerable and answerable prompts - then convert the pt files to the formats adhering to the evaluation scripts
+    if not args.only_answerable_instances and not args.only_unanswerable_instances:
+        pt_to_evaluate_format_converter(indirs=[outdir_path], is_beam_experiment=False)
 
-
-
+        # if in beams larger than 1 - also run the conversion to the beam relaxation
+        if [k for k in k_beams_list if k>1]:
+            pt_to_evaluate_format_converter(indirs=[outdir_path], is_beam_experiment=True)
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description="")
     argparser.add_argument('--outdir', type=str, default=None, help='outdir to save results')
-    argparser.add_argument("--models", nargs='+', type=str, default=["Flan-T5-small"], help="which models to send requests to. any from: Flan-UL2, Flan-T5-xxl, OPT, Flan-T5-small, and OPT-1-3B.")
+    argparser.add_argument("--models", nargs='+', type=str, default=["Flan-T5-small"], help="which models to send requests to. any from: Flan-UL2, Flan-T5-xxl, and OPT-IML.")
     argparser.add_argument("--datasets", nargs='+', type=str, default=["squad"], help="which datasets to work on. any from: squad, NQ, musique")
     argparser.add_argument("--n-instances", type=int, default=None, help="number of instances to process")
     argparser.add_argument("--k-beams", type=int, default=1, help="beam size (will also be the number of returned outputs to check \"unanswerable\" from)")

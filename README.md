@@ -28,7 +28,7 @@ To run the zero-shot prompt-manipulation experiment, run the following code:
 ```
 python zero_shot_embeddings.py --models <MODELS> --adversarial --control-group --datasets <DATASETS> --all-instances --return-only-generated-text --outdir /path/to/outdir
 ```
-where `<MODELS>` should be replaced by either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT` (or their concatenation - for running on several models), and `<DATASETS>` should be replaced by either one of `squad`, `NQ`, `musique` (or their concatenation - for running on several datasets).
+where `<MODELS>` should be replaced by either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML` (or their concatenation - for running on several models), and `<DATASETS>` should be replaced by either one of `squad`, `NQ`, `musique` (or their concatenation - for running on several datasets).
 
 This should save in the outdir folder two pt files - one starting with `adversarial` and one starting with `control_group`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
 
@@ -140,7 +140,7 @@ Next, to perform the actual prompting of the LLMs with the erasure component, ru
 python zero_shot_embeddings_erasure.py --models <MODELS> --adversarial --control-group --datasets <DATASETS> --all-instances --outdir /path/to/outdir --eraser-dir /path/to/trained_eraser --only-first-decoding
 ```
 
-where `<MODELS>` should be replaced by either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT` (or their concatenation - for running on several models), and `<DATASETS>` should be replaced by either one of `squad`, `NQ`, `musique` (or their concatenation - for running on several datasets).
+where `<MODELS>` should be replaced by either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML` (or their concatenation - for running on several models), and `<DATASETS>` should be replaced by either one of `squad`, `NQ`, `musique` (or their concatenation - for running on several datasets).
 
 This should save in the outdir folder two pt files - one starting with `adversarial` and one starting with `control_group`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
 

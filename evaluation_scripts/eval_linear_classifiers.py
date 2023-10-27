@@ -102,23 +102,23 @@ def create_dir(subdirs):
 
 
 def get_curr_model(indir):
-    if "UL2_Flan" in indir:
-        curr_model = "UL2_Flan"
-    elif "T5_xxl_Flan" in indir:
-        curr_model = "T5_xxl_Flan"
-    elif "OPT" in indir:
-        curr_model = "OPT"
+    if "Flan-UL2" in indir:
+        curr_model = "Flan-UL2"
+    elif "Flan-T5-xxl" in indir:
+        curr_model = "Flan-T5-xxl"
+    elif "OPT-IML" in indir:
+        curr_model = "OPT-IML"
     else:
         raise Exception(f"curr model not found in indir: {indir}")
     return curr_model
 
 def get_curr_classifier_model(classifier_dir):
-    if "UL2_Flan" in classifier_dir:
-        curr_classifier_model = "UL2_Flan"
-    elif "T5_xxl_Flan" in classifier_dir:
-        curr_classifier_model = "T5_xxl_Flan"
-    elif "OPT" in classifier_dir:
-        curr_classifier_model = "OPT"
+    if "Flan-UL2" in classifier_dir:
+        curr_classifier_model = "Flan-UL2"
+    elif "Flan-T5-xxl" in classifier_dir:
+        curr_classifier_model = "Flan-T5-xxl"
+    elif "OPT-IML" in classifier_dir:
+        curr_classifier_model = "OPT-IML"
     else:
         raise Exception(f"curr model not found in indir: {classifier_dir}")
     return curr_classifier_model

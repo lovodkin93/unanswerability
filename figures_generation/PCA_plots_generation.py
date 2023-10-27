@@ -47,12 +47,12 @@ def get_data_name(full_file_path):
         raise Exception(f"dataset name not found in {full_file_path}")
 
 def get_model_name(curr_indir):
-    if "UL2_Flan" in curr_indir:
-        return "UL2"
-    elif "T5_xxl_Flan" in curr_indir:
-        return "T5"
-    elif "OPT" in curr_indir:
-        return "OPT"
+    if "Flan-UL2" in curr_indir:
+        return "Flan-UL2"
+    elif "Flan-T5-xxl" in curr_indir:
+        return "Flan-T5-xxl"
+    elif "OPT-IML" in curr_indir:
+        return "OPT-IML"
     else:
         raise Exception(f"curr model not found in indir: {curr_indir}")
 
