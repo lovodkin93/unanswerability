@@ -2,8 +2,6 @@ import torch
 import pandas as pd
 from tqdm import tqdm
 import os
-import re
-from copy import deepcopy
 import argparse
 import json
 import sys
@@ -12,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from constants import PROMPT_TYPES, UNANSWERABLE_REPLIES, UNANSWERABLE_REPLIES_EXACT
 
 
-def pt_to_csv_none_beam(indirs):
+def pt_to_csv_non_beam(indirs):
     for indir in tqdm(indirs):
         for subdir, dirs, files in os.walk(indir):
             for file in files:
@@ -65,7 +63,7 @@ def pt_to_csv_beam(indirs):
                 curr_df = pd.DataFrame(curr_df_dict)
                 curr_df.to_csv(curr_outdir)
 
-def csv_tp_benchmark_evaluate_format(indirs, data_name):
+def csv_to_benchmark_evaluate_format(indirs, data_name):
     eval_dir = f"{data_name}_evaluate_script_format"
 
     for indir in tqdm(indirs):
@@ -75,7 +73,7 @@ def csv_tp_benchmark_evaluate_format(indirs, data_name):
                 if not file.endswith("csv") or not data_name in file:
                     continue
                 curr_df = pd.read_csv(os.path.join(subdir, file))
-                if data_name == "squad" or "control_group" in file:
+                if data_name == "squad" or file.startswith("answerable"):
                     id_suffix = ""
                 else:
                     id_suffix = "-unanswerable" 
@@ -108,15 +106,15 @@ def csv_tp_benchmark_evaluate_format(indirs, data_name):
                 with open(os.path.join(curr_subdir, f"{data_name}_{prompt_type}.json"), 'w') as f1:
                     f1.write(json.dumps(out_dict))    
 
-def main(args):
-    if args.is_beam_experiment:
-        pt_to_csv_beam(args.indirs)
+def main(indirs, is_beam_experiment):
+    if is_beam_experiment:
+        pt_to_csv_beam(indirs)
     else:
-        pt_to_csv_none_beam(args.indirs)
+        pt_to_csv_non_beam(indirs)
         
-    csv_tp_benchmark_evaluate_format(args.indirs, 'squad')
-    csv_tp_benchmark_evaluate_format(args.indirs, 'NQ')
-    csv_tp_benchmark_evaluate_format(args.indirs, 'musique')
+    csv_to_benchmark_evaluate_format(indirs, 'squad')
+    csv_to_benchmark_evaluate_format(indirs, 'NQ')
+    csv_to_benchmark_evaluate_format(indirs, 'musique')
 
 
 if __name__ == '__main__':
@@ -124,4 +122,4 @@ if __name__ == '__main__':
     argparser.add_argument("--indirs", nargs='+', type=str, required=True, help="path to the indirs where the pt files were saved")
     argparser.add_argument("--is-beam-experiment", action='store_true', default=False, help="Whether this is the beam relaxation experiment or the regular prompt-manipulation experiments.")
     args = argparser.parse_args()
-    main(args)
+    main(args.indirs, args.is_beam_experiment)

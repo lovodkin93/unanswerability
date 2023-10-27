@@ -8,10 +8,11 @@ import gc
 import json
 import os
 import argparse
-import time
 from pathlib import Path
 import logging
 from constants import *
+from post_processing.pt_to_benchmarks_evaluate_format import main as pt_to_evaluate_format_converter
+
 
 # Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)
@@ -317,7 +318,13 @@ def main(args):
                     
                     torch.save(responses, curr_outdir) # and to load it: loaded_dict = torch.load(curr_outdir)
 
+    # if not only_answerable_instances and not only_unanswerable_instances - namely we have both answerable and answerable prompts - then convert the pt files to the formats adhering to the evaluation scripts
+    if not args.only_answerable_instances and not args.only_unanswerable_instances:
+        pt_to_evaluate_format_converter(indirs=[outdir_path], is_beam_experiment=False)
 
+        # if in beams larger than 1 - also run the conversion to the beam relaxation
+        if [k for k in k_beams_list if k>1]:
+            pt_to_evaluate_format_converter(indirs=[outdir_path], is_beam_experiment=True)
 
 
 
