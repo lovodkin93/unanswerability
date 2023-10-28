@@ -51,25 +51,25 @@ def get_data(indir, prompt_type, dataset, aggregation_type, embedding_type):
         if not dataset in file_name or not file_name.endswith(".pt"):
             continue
         curr_data = torch.load(os.path.join(indir, file_name), map_location="cpu")
-        data_type = "control_group" if "control_group" in file_name else "adversarial"
+        data_type = "un-answerable" if "un-answerable" in file_name else "answerable"
         data[data_type] = curr_data
     if not data: # didn't find any of the dataset's tensors (no dataset in this folder)
         return None, None, None, None
-    # adversarial_instances = [torch.stack(adapt_hidden_embeddings(elem)).mean(dim=0).cpu().numpy() for elem in data["adversarial"][prompt_type]]
-    # control_group_instances = [torch.stack(adapt_hidden_embeddings(elem)).mean(dim=0).cpu().numpy() for elem in data["control_group"][prompt_type]]
+    # unanswerable_instances = [torch.stack(adapt_hidden_embeddings(elem)).mean(dim=0).cpu().numpy() for elem in data["un-answerable"][prompt_type]]
+    # answerable_instances = [torch.stack(adapt_hidden_embeddings(elem)).mean(dim=0).cpu().numpy() for elem in data["answerable"][prompt_type]]
 
     if embedding_type == "first_hidden_embedding":
-        adversarial_instances = [elem[embedding_type].cpu().numpy() for elem in data["adversarial"][prompt_type]]
-        control_group_instances = [elem[embedding_type].cpu().numpy() for elem in data["control_group"][prompt_type]]
+        unanswerable_instances = [elem[embedding_type].cpu().numpy() for elem in data["un-answerable"][prompt_type]]
+        answerable_instances = [elem[embedding_type].cpu().numpy() for elem in data["answerable"][prompt_type]]
     elif aggregation_type == "average":
-        adversarial_instances = [torch.stack(adapt_hidden_embeddings(elem)).mean(dim=0).cpu().numpy() for elem in data["adversarial"][prompt_type]]
-        control_group_instances = [torch.stack(adapt_hidden_embeddings(elem)).mean(dim=0).cpu().numpy() for elem in data["control_group"][prompt_type]]
+        unanswerable_instances = [torch.stack(adapt_hidden_embeddings(elem)).mean(dim=0).cpu().numpy() for elem in data["un-answerable"][prompt_type]]
+        answerable_instances = [torch.stack(adapt_hidden_embeddings(elem)).mean(dim=0).cpu().numpy() for elem in data["answerable"][prompt_type]]
     elif aggregation_type == "union":
-        adversarial_instances = [emb.cpu().numpy() for elem in data["adversarial"][prompt_type] for emb in adapt_hidden_embeddings(elem)]
-        control_group_instances = [emb.cpu().numpy() for elem in data["control_group"][prompt_type] for emb in adapt_hidden_embeddings(elem)]
+        unanswerable_instances = [emb.cpu().numpy() for elem in data["un-answerable"][prompt_type] for emb in adapt_hidden_embeddings(elem)]
+        answerable_instances = [emb.cpu().numpy() for elem in data["answerable"][prompt_type] for emb in adapt_hidden_embeddings(elem)]
     elif aggregation_type == "only_first_tkn":
-        adversarial_instances = [adapt_hidden_embeddings(elem)[0].cpu().numpy() for elem in data["adversarial"][prompt_type]]
-        control_group_instances = [adapt_hidden_embeddings(elem)[0].cpu().numpy() for elem in data["control_group"][prompt_type]]
+        unanswerable_instances = [adapt_hidden_embeddings(elem)[0].cpu().numpy() for elem in data["un-answerable"][prompt_type]]
+        answerable_instances = [adapt_hidden_embeddings(elem)[0].cpu().numpy() for elem in data["answerable"][prompt_type]]
     else:
         raise Exception("--aggregation-type did not receive a valid option. Only one of 'average', 'union' or 'only_first_tkn'")
 
@@ -77,10 +77,10 @@ def get_data(indir, prompt_type, dataset, aggregation_type, embedding_type):
 
 
 
-    adversarial_ids = data['adversarial']['ids']
-    control_group_ids = data['control_group']['ids']
+    unanswerable_ids = data['un-answerable']['ids']
+    answerable_ids = data['answerable']['ids']
 
-    return adversarial_instances, control_group_instances, adversarial_ids, control_group_ids
+    return unanswerable_instances, answerable_instances, unanswerable_ids, answerable_ids
 
 def create_dir(subdirs):
     full_subdir = ""
@@ -265,8 +265,8 @@ def main(args):
 
     for indir in tqdm(indirs):
         for dataset in datasets:
-            adversarial_instances, control_group_instances, adversarial_ids, control_group_ids = get_data(indir, prompt_type, dataset, aggregation_type=args.aggregation_type, embedding_type=args.embedding_type)
-            if adversarial_instances == None: # didn't find any of the dataset's tensors (no dataset in this folder)
+            unanswerable_instances, answerable_instances, unanswerable_ids, answerable_ids = get_data(indir, prompt_type, dataset, aggregation_type=args.aggregation_type, embedding_type=args.embedding_type)
+            if unanswerable_instances == None: # didn't find any of the dataset's tensors (no dataset in this folder)
                 continue
             for classifier_dir in classifier_dirs:
                 
@@ -282,11 +282,11 @@ def main(args):
                 curr_classifier_prompt_style = get_curr_prompt_style(classifier_dir)
 
                 # Combine the instances and create corresponding labels
-                adversarial_labels = np.zeros(len(adversarial_instances))
-                control_group_labels = np.ones(len(control_group_instances))
+                unanswerable_labels = np.zeros(len(unanswerable_instances))
+                answerable_labels = np.ones(len(answerable_instances))
 
-                X_test = np.concatenate((adversarial_instances, control_group_instances))
-                y_test = np.concatenate((adversarial_labels, control_group_labels))
+                X_test = np.concatenate((unanswerable_instances, answerable_instances))
+                y_test = np.concatenate((unanswerable_labels, answerable_labels))
 
                 # Load the classifier from the file
                 with open(classifier_dir, "rb") as file:
@@ -308,14 +308,14 @@ def main(args):
                 outdir_subdirs = ["classifier_predictions", args.embedding_type, f"{prompt_type}_test_{curr_classifier_prompt_style}_classifier", args.zero_or_few_shot, curr_embedding_aggregation, curr_model, f"{curr_classifier_dataset}_classifier", curr_train_size]
                 create_dir(outdir_subdirs)
 
-                adversarial_predicts = [label_dict[l] for l in list(y_test_pred[:len(adversarial_instances)])]
-                control_group_predicts = [label_dict[l] for l in list(y_test_pred[len(adversarial_instances):])]
+                unanswerable_predicts = [label_dict[l] for l in list(y_test_pred[:len(unanswerable_instances)])]
+                answerable_predicts = [label_dict[l] for l in list(y_test_pred[len(unanswerable_instances):])]
 
-                results_adversarial = {id:adversarial_predicts[i] for i,id in enumerate(adversarial_ids)}
-                results_control_group = {id:control_group_predicts[i] for i,id in enumerate(control_group_ids)}
+                results_unanswerable = {id:unanswerable_predicts[i] for i,id in enumerate(unanswerable_ids)}
+                results_answerable = {id:answerable_predicts[i] for i,id in enumerate(answerable_ids)}
 
-                results = {"adversarial_predicts": results_adversarial,
-                           "control_group_predicts": results_control_group}
+                results = {"un-answerable_predicts": results_unanswerable,
+                           "answerable_predicts": results_answerable}
                 print(f'save to {os.path.join(*outdir_subdirs, f"{dataset}_classification_report.txt")}')
                 with open(os.path.join(*outdir_subdirs, f"{dataset}_predictions.json"), 'w') as f1:
                     f1.write(json.dumps(results))

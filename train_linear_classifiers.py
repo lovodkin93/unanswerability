@@ -57,25 +57,25 @@ def get_data(indir, prompt_type, embedding_type, dataset, num_instances, aggrega
         if num_instances != None:
             curr_data = {key:value[:num_instances] for key,value in curr_data.items()}
 
-        data_type = "control_group" if "control_group" in file_name else "adversarial"
+        data_type = "un-answerable" if "un-answerable" in file_name else "answerable"
         data[data_type] = curr_data
 
     if embedding_type == "first_hidden_embedding":
-        adversarial_instances = [elem[embedding_type].mean(dim=0).cpu().numpy() for elem in data["adversarial"][prompt_type]]
-        control_group_instances = [elem[embedding_type].mean(dim=0).cpu().numpy() for elem in data["control_group"][prompt_type]]
+        unanswerable_instances = [elem[embedding_type].mean(dim=0).cpu().numpy() for elem in data["un-answerable"][prompt_type]]
+        answerable_instances = [elem[embedding_type].mean(dim=0).cpu().numpy() for elem in data["answerable"][prompt_type]]
     elif aggregation_type == "average":
-        adversarial_instances = [torch.stack(adapt_hidden_embeddings(elem, embedding_type)).mean(dim=0).cpu().numpy() for elem in data["adversarial"][prompt_type]]
-        control_group_instances = [torch.stack(adapt_hidden_embeddings(elem, embedding_type)).mean(dim=0).cpu().numpy() for elem in data["control_group"][prompt_type]]
+        unanswerable_instances = [torch.stack(adapt_hidden_embeddings(elem, embedding_type)).mean(dim=0).cpu().numpy() for elem in data["un-answerable"][prompt_type]]
+        answerable_instances = [torch.stack(adapt_hidden_embeddings(elem, embedding_type)).mean(dim=0).cpu().numpy() for elem in data["answerable"][prompt_type]]
     elif aggregation_type == "union":
-        adversarial_instances = [emb.cpu().numpy() for elem in data["adversarial"][prompt_type] for emb in adapt_hidden_embeddings(elem, embedding_type)]
-        control_group_instances = [emb.cpu().numpy() for elem in data["control_group"][prompt_type] for emb in adapt_hidden_embeddings(elem, embedding_type)]
+        unanswerable_instances = [emb.cpu().numpy() for elem in data["un-answerable"][prompt_type] for emb in adapt_hidden_embeddings(elem, embedding_type)]
+        answerable_instances = [emb.cpu().numpy() for elem in data["answerable"][prompt_type] for emb in adapt_hidden_embeddings(elem, embedding_type)]
     elif aggregation_type == "only_first_tkn":
-        adversarial_instances = [adapt_hidden_embeddings(elem, embedding_type)[0].cpu().numpy() for elem in data["adversarial"][prompt_type]]
-        control_group_instances = [adapt_hidden_embeddings(elem, embedding_type)[0].cpu().numpy() for elem in data["control_group"][prompt_type]]
+        unanswerable_instances = [adapt_hidden_embeddings(elem, embedding_type)[0].cpu().numpy() for elem in data["un-answerable"][prompt_type]]
+        answerable_instances = [adapt_hidden_embeddings(elem, embedding_type)[0].cpu().numpy() for elem in data["answerable"][prompt_type]]
     else:
         raise Exception("--aggregation-type did not receive a valid option. Only one of 'average', 'union' or 'only_first_tkn'")
 
-    return adversarial_instances, control_group_instances
+    return unanswerable_instances, answerable_instances
 
 
 
@@ -96,14 +96,14 @@ def main(args):
     print(f"classifier saved to {outdir}")
 
     # get data
-    adversarial_instances, control_group_instances = get_data(indir, prompt_type, embedding_type, dataset, num_instances, aggregation_type)
+    unanswerable_instances, answerable_instances = get_data(indir, prompt_type, embedding_type, dataset, num_instances, aggregation_type)
 
     # Combine the instances and create corresponding labels
-    adversarial_labels = np.zeros(len(adversarial_instances))
-    control_group_labels = np.ones(len(control_group_instances))
+    unanswerable_labels = np.zeros(len(unanswerable_instances))
+    answerable_labels = np.ones(len(answerable_instances))
 
-    X = np.concatenate((adversarial_instances, control_group_instances))
-    y = np.concatenate((adversarial_labels, control_group_labels))
+    X = np.concatenate((unanswerable_instances, answerable_instances))
+    y = np.concatenate((unanswerable_labels, answerable_labels))
 
     # Split data into train, validation, and test sets (60% train, 20% validation, 20% test)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=SEED)
@@ -154,7 +154,7 @@ if __name__ == '__main__':
     argparser.add_argument('--epochs', type=int, default=500, help='number of epochs')
     argparser.add_argument('--batch-size', type=int, default=32, help='batch size of train set.')
     argparser.add_argument('--eval-batch-size', type=int, default=64, help='batch size of dev and test sets.')
-    argparser.add_argument('--num-instances', type=int, default=None, help='number of instances to use for training (will take the same amount from the control_group and the adversarial). If None - will take all.')
+    argparser.add_argument('--num-instances', type=int, default=None, help='number of instances to use for training (will take the same amount from the answerable and the un-answerable). If None - will take all.')
     argparser.add_argument('--save-interval', type=int, default=10, help='how frequently to save model')
     argparser.add_argument('--eval-interval', type=int, default=10, help='how frequently to evaluate on the devset (in epochs)')
     argparser.add_argument('--aggregation-type', type=str, default="only_first_tkn", help='how to aggregate all the hidden layers of all the generated tokens of a single instance (choose from "average" to average them, "union" to treat each of them as an instance, and "only_first_tkn" to only take the first token\'s hidden layers).')

@@ -15,18 +15,18 @@ def check_if_unanswerable(response):
     value = str(response).lower().strip()
     return any(elem1==value for elem1 in UNANSWERABLE_REPLIES_EXACT) or any(f"{elem1}."==value for elem1 in UNANSWERABLE_REPLIES_EXACT) or any(elem2 in value.lower() for elem2 in UNANSWERABLE_REPLIES)
 
-def calc_TP_TN_FP_FN(adversarial_lst, control_group_lst):
-    adversarial_elems = {"tp": len([elem for elem in adversarial_lst if elem]),
-                         "fn": len([elem for elem in adversarial_lst if not elem]),
-                         "fp": len([elem for elem in control_group_lst if not elem]),
-                         "tn": len([elem for elem in control_group_lst if elem])}
+def calc_TP_TN_FP_FN(unanswerable_lst, answerable_lst):
+    unanswerable_elems = {"tp": len([elem for elem in unanswerable_lst if elem]),
+                         "fn": len([elem for elem in unanswerable_lst if not elem]),
+                         "fp": len([elem for elem in answerable_lst if not elem]),
+                         "tn": len([elem for elem in answerable_lst if elem])}
     
-    control_group_elems = {"tp": len([elem for elem in control_group_lst if elem]),
-                           "fn": len([elem for elem in control_group_lst if not elem]),
-                           "fp": len([elem for elem in adversarial_lst if not elem]),
-                           "tn": len([elem for elem in adversarial_lst if elem])}
+    answerable_elems = {"tp": len([elem for elem in answerable_lst if elem]),
+                           "fn": len([elem for elem in answerable_lst if not elem]),
+                           "fp": len([elem for elem in unanswerable_lst if not elem]),
+                           "tn": len([elem for elem in unanswerable_lst if elem])}
 
-    return adversarial_elems, control_group_elems
+    return unanswerable_elems, answerable_elems
 
 def get_all_results(elems):
     elems = {key:float(value) for key,value in elems.items()}
@@ -44,13 +44,13 @@ def get_all_results(elems):
             "support": support
             }
 
-def create_output_tabular_structure(adversarial_results, control_group_results):
+def create_output_tabular_structure(unanswerable_results, answerable_results):
     labels = ['un-answerable', 'answerable', 'accuracy']
     columns = ['precision', 'recall', 'f1-score', 'support']
-    data_df = {columns[0] : [adversarial_results["P"], control_group_results["P"], ''],
-               columns[1] : [adversarial_results["R"], control_group_results["R"], ''],
-               columns[2] : [adversarial_results["F1"], control_group_results["F1"], adversarial_results["accuracy"]],
-               columns[3] : [adversarial_results["support"], control_group_results["support"], adversarial_results["support"]+control_group_results["support"]]}
+    data_df = {columns[0] : [unanswerable_results["P"], answerable_results["P"], ''],
+               columns[1] : [unanswerable_results["R"], answerable_results["R"], ''],
+               columns[2] : [unanswerable_results["F1"], answerable_results["F1"], unanswerable_results["accuracy"]],
+               columns[3] : [unanswerable_results["support"], answerable_results["support"], unanswerable_results["support"]+answerable_results["support"]]}
 
     table_txt = [
         ['',        columns[0],             columns[1],             columns[2],             columns[3]],
@@ -63,7 +63,7 @@ def create_output_tabular_structure(adversarial_results, control_group_results):
 
 def main(args):
     for curr_indir in args.indirs:
-        curr_adversarial, curr_control_group = pd.DataFrame(), pd.DataFrame()
+        curr_unanswerable, curr_answerable = pd.DataFrame(), pd.DataFrame()
 
         for subdir, dirs, files in os.walk(curr_indir):
             if not os.path.basename(subdir) in ["num_return_seq_1", "locate_unanswerable_in_beams"]:
@@ -71,17 +71,17 @@ def main(args):
             for filename in files:
                 if not filename.endswith(".csv"):
                     continue
-                if "control_group" in filename:
-                    curr_control_group = pd.read_csv(os.path.join(subdir, filename))
-                elif "adversarial" in filename:
-                    curr_adversarial = pd.read_csv(os.path.join(subdir, filename))
+                if "un-answerable" in filename:
+                    curr_unanswerable = pd.read_csv(os.path.join(subdir, filename))
+                elif filename.startwith("answerable"):
+                    curr_answerable = pd.read_csv(os.path.join(subdir, filename))
                 else:
                     raise Exception(f"invalid csv file: {os.path.join(subdir, filename)}")
                 
                 # get the dataset name
                 curr_dataset = get_dataset_name(os.path.join(subdir, filename))
             
-            if curr_control_group.empty or curr_adversarial.empty:
+            if curr_answerable.empty or curr_unanswerable.empty:
                 raise Exception(f"didn't find two csv's in {subdir}")
             
             # create outdir
@@ -91,17 +91,17 @@ def main(args):
 
             outdir_df_dict = {}
             for prompt_type in PROMPT_TYPES:
-                if not prompt_type in curr_adversarial.columns:
+                if not prompt_type in curr_unanswerable.columns:
                     continue
-                adversarial_response_unanswerable = [check_if_unanswerable(elem) for elem in curr_adversarial[prompt_type]]
-                control_group_response_not_unanswerable = [not check_if_unanswerable(elem) for elem in curr_control_group[prompt_type]]
+                unanswerable_response_unanswerable = [check_if_unanswerable(elem) for elem in curr_unanswerable[prompt_type]]
+                answerable_response_not_unanswerable = [not check_if_unanswerable(elem) for elem in curr_answerable[prompt_type]]
                 
-                adversarial_elems, control_group_elems = calc_TP_TN_FP_FN(adversarial_response_unanswerable, control_group_response_not_unanswerable)        
+                unanswerable_elems, answerable_elems = calc_TP_TN_FP_FN(unanswerable_response_unanswerable, answerable_response_not_unanswerable)        
 
-                adversarial_results = get_all_results(adversarial_elems)
-                control_group_results = get_all_results(control_group_elems)
+                unanswerable_results = get_all_results(unanswerable_elems)
+                answerable_results = get_all_results(answerable_elems)
 
-                output_text, labels, data_df = create_output_tabular_structure(adversarial_results, control_group_results)
+                output_text, labels, data_df = create_output_tabular_structure(unanswerable_results, answerable_results)
                 
                 # print results
                 if args.print_results:

@@ -39,7 +39,7 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, icl_variant
     if args.n_instances != None:
         data = data[:args.n_instances]
 
-    # the control-group doesn't have this parameter
+    # the answerable instances don't have this parameter
     if "Unanswerablity-Reason" in data[0].keys():
         responses["Unanswerablity-Reason"] = []
 
