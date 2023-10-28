@@ -1,4 +1,4 @@
-# unanswerable_adversarial
+# Unanswerability
 Begin by setting the `MAX_GPU_MEM` and `MAX_CPU_MEM` parameters in `constants.py` to the maximum GPU and CPU (respectively) memory capacity of the machine you work on.
 
 Additionally, create the conda env of the project by setting the `prefix` variable in `unanswerability_env.yml` to your `path/to/anaconda3/envs/unanswerability_env` location, and then run:
@@ -26,11 +26,11 @@ unzip data.zip
 ### zero-shot Prompting
 To run the zero-shot prompt-manipulation experiment, run the following code:
 ```
-python zero_shot_embeddings.py --models <MODELS> --adversarial --control-group --datasets <DATASETS> --all-instances --return-only-generated-text --outdir /path/to/outdir
+python zero_shot_embeddings.py --models <MODELS> --datasets <DATASETS> --return-only-generated-text --outdir /path/to/outdir
 ```
 where `<MODELS>` should be replaced by either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML` (or their concatenation - for running on several models), and `<DATASETS>` should be replaced by either one of `squad`, `NQ`, `musique` (or their concatenation - for running on several datasets).
 
-This should save in the outdir folder two pt files - one starting with `adversarial` and one starting with `control_group`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
+This should save in the outdir folder two pt files - one starting with `un-answerable` and one starting with `answerable`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
 
 Additionally, to run this script on the develpment set, also pass the `--devset` flag.
 
@@ -39,7 +39,7 @@ Also, to run on different prompt variants (affects only cases where there is a h
 ### Few-shot Prompting
 To run the few-shot prompt-manipulation experiment, run the following code:
 ```
-python few_shot_with_instructions_embeddings.py --models <MODELS> --adversarial --control-group --datasets <DATASETS> --all-instances --return-only-generated-text --outdir /path/to/outdir
+python few_shot_with_instructions_embeddings.py --models <MODELS> --datasets <DATASETS> --return-only-generated-text --outdir /path/to/outdir
 ```
 `<MODELS>` and `<DATASETS>` are similar to those in the Zero-shot prompting experiments.
 
@@ -66,14 +66,14 @@ Additionally, to get the results on the development set, add the parameter `--de
 To run the probing experiments, you first need to run the aforementioned zero-shot experiments **without** the `--return-only-generated-text` parameter, which will also save the embeddings of the generations. In other words, run:
 
 ```
-python zero_shot_embeddings.py --models <MODELS> --adversarial --control-group --datasets <DATASETS> --all-instances --outdir /path/to/outdir
+python zero_shot_embeddings.py --models <MODELS> --datasets <DATASETS> --outdir /path/to/outdir
 ```
 
 This will save the embeddings of the <ins>last</ins> hidden layer of the first generated token for each instance of <ins>the test set</ins>.
 
 Additionally, to train the linear classifiers, we also need to extract the embeddings of the **train set**. For that, we need to also pass `--trainset`:
 ```
-python zero_shot_embeddings.py --models <MODELS> --adversarial --control-group --datasets <DATASETS> --all-instances --outdir /path/to/outdir --trainset
+python zero_shot_embeddings.py --models <MODELS> --datasets <DATASETS> --outdir /path/to/outdir --trainset
 ```
 This will also save the embeddings of the <ins>last</ins> hidden layer of the first generated token for each instance, but for <ins>the train set</ins>.
 
@@ -137,12 +137,12 @@ Once the training is finished, you will find the trained eraser under `/path/to/
 Next, to perform the actual prompting of the LLMs with the erasure component, run:
 
 ```
-python zero_shot_embeddings_erasure.py --models <MODELS> --adversarial --control-group --datasets <DATASETS> --all-instances --outdir /path/to/outdir --eraser-dir /path/to/trained_eraser --only-first-decoding
+python zero_shot_embeddings_erasure.py --models <MODELS> --datasets <DATASETS> --outdir /path/to/outdir --eraser-dir /path/to/trained_eraser --only-first-decoding
 ```
 
 where `<MODELS>` should be replaced by either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML` (or their concatenation - for running on several models), and `<DATASETS>` should be replaced by either one of `squad`, `NQ`, `musique` (or their concatenation - for running on several datasets).
 
-This should save in the outdir folder two pt files - one starting with `adversarial` and one starting with `control_group`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
+This should save in the outdir folder two pt files - one starting with `un-answerable` and one starting with `answerable`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
 
 Now, to evaluate the responses, follow the the instructions under the **Evaluation** sub-section of the **Prompt Manipulations and Beam Relaxation Experiments** section. 
 
