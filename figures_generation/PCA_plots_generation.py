@@ -79,37 +79,37 @@ def get_data(curr_indir, prompt_type, embedding_type):
             curr_data = torch.load(os.path.join(subdir, file))
             curr_data_name = get_data_name(os.path.join(subdir, file))
 
-            if file.startswith("adversarial"):
+            if file.startswith("un-answerable"):
                 
-                full_pt_dicts["adversarial"] = curr_data
+                full_pt_dicts["unanswerable"] = curr_data
 
 
 
                 if embedding_type == "first_hidden_embedding":
-                    adversarial_all_embeddings = [instance[embedding_type] for instance in curr_data[prompt_type]]
+                    unanswerable_all_embeddings = [instance[embedding_type] for instance in curr_data[prompt_type]]
                 else:
-                    adversarial_all_embeddings = [torch.stack(adapt_hidden_embeddings(instance)) for instance in curr_data[prompt_type]]
+                    unanswerable_all_embeddings = [torch.stack(adapt_hidden_embeddings(instance)) for instance in curr_data[prompt_type]]
             
 
-            elif file.startswith("control_group"):
-                full_pt_dicts["control_group"] = curr_data
+            elif file.startswith("answerable"):
+                full_pt_dicts["answerable"] = curr_data
 
                 if embedding_type == "first_hidden_embedding":
-                    control_group_all_embeddings = [instance[embedding_type] for instance in curr_data[prompt_type]]
+                    answerable_all_embeddings = [instance[embedding_type] for instance in curr_data[prompt_type]]
                 else:
-                    control_group_all_embeddings = [torch.stack(adapt_hidden_embeddings(instance)) for instance in curr_data[prompt_type]]
+                    answerable_all_embeddings = [torch.stack(adapt_hidden_embeddings(instance)) for instance in curr_data[prompt_type]]
             else:
-                raise Exception(f"{file} file doesn't start with \"adversarial\" nor with \"control_group\".")
+                raise Exception(f"{file} file doesn't start with \"unanswerable\" nor with \"answerable\".")
     
-    return adversarial_all_embeddings, control_group_all_embeddings, full_pt_dicts, curr_data_name
+    return unanswerable_all_embeddings, answerable_all_embeddings, full_pt_dicts, curr_data_name
 
 
 
-def create_pca_plot(data_pca, unanswerable_adversarial, answerable_adversarial, unanswerable_control_group, adversarial_embeddings, outdir):
+def create_pca_plot(data_pca, unanswerable_identifies_as_unanswerable, unanswerable_identifies_as_answerable, answerable_identified_as_unanswerable, unanswerable_embeddings, outdir):
     scatter1 = go.Scatter3d(
-        x=data_pca[:len(unanswerable_adversarial), 0],
-        y=data_pca[:len(unanswerable_adversarial), 1],
-        z=data_pca[:len(unanswerable_adversarial), 2],
+        x=data_pca[:len(unanswerable_identifies_as_unanswerable), 0],
+        y=data_pca[:len(unanswerable_identifies_as_unanswerable), 1],
+        z=data_pca[:len(unanswerable_identifies_as_unanswerable), 2],
         mode='markers',
         marker=dict(
             size=2,
@@ -119,9 +119,9 @@ def create_pca_plot(data_pca, unanswerable_adversarial, answerable_adversarial, 
     )
 
     scatter2 = go.Scatter3d(
-        x=data_pca[len(unanswerable_adversarial):len(unanswerable_adversarial)+len(answerable_adversarial), 0],
-        y=data_pca[len(unanswerable_adversarial):len(unanswerable_adversarial)+len(answerable_adversarial), 1],
-        z=data_pca[len(unanswerable_adversarial):len(unanswerable_adversarial)+len(answerable_adversarial), 2],
+        x=data_pca[len(unanswerable_identifies_as_unanswerable):len(unanswerable_identifies_as_unanswerable)+len(unanswerable_identifies_as_answerable), 0],
+        y=data_pca[len(unanswerable_identifies_as_unanswerable):len(unanswerable_identifies_as_unanswerable)+len(unanswerable_identifies_as_answerable), 1],
+        z=data_pca[len(unanswerable_identifies_as_unanswerable):len(unanswerable_identifies_as_unanswerable)+len(unanswerable_identifies_as_answerable), 2],
         mode='markers',
         marker=dict(
             size=2,
@@ -131,9 +131,9 @@ def create_pca_plot(data_pca, unanswerable_adversarial, answerable_adversarial, 
     )
 
     scatter3 = go.Scatter3d(
-        x=data_pca[len(adversarial_embeddings):len(adversarial_embeddings)+len(unanswerable_control_group), 0],
-        y=data_pca[len(adversarial_embeddings):len(adversarial_embeddings)+len(unanswerable_control_group), 1],
-        z=data_pca[len(adversarial_embeddings):len(adversarial_embeddings)+len(unanswerable_control_group), 2],
+        x=data_pca[len(unanswerable_embeddings):len(unanswerable_embeddings)+len(answerable_identified_as_unanswerable), 0],
+        y=data_pca[len(unanswerable_embeddings):len(unanswerable_embeddings)+len(answerable_identified_as_unanswerable), 1],
+        z=data_pca[len(unanswerable_embeddings):len(unanswerable_embeddings)+len(answerable_identified_as_unanswerable), 2],
         mode='markers',
         marker=dict(
             size=2,
@@ -143,9 +143,9 @@ def create_pca_plot(data_pca, unanswerable_adversarial, answerable_adversarial, 
     )
 
     scatter4 = go.Scatter3d(
-        x=data_pca[len(adversarial_embeddings)+len(unanswerable_control_group):, 0],
-        y=data_pca[len(adversarial_embeddings)+len(unanswerable_control_group):, 1],
-        z=data_pca[len(adversarial_embeddings)+len(unanswerable_control_group):, 2],
+        x=data_pca[len(unanswerable_embeddings)+len(answerable_identified_as_unanswerable):, 0],
+        y=data_pca[len(unanswerable_embeddings)+len(answerable_identified_as_unanswerable):, 1],
+        z=data_pca[len(unanswerable_embeddings)+len(answerable_identified_as_unanswerable):, 2],
         mode='markers',
         marker=dict(
             size=2,
@@ -203,42 +203,42 @@ def main(args):
     outdir_path_cls.mkdir(parents=True, exist_ok=True)
 
     for indir in tqdm(indirs):
-        adversarial_all_embeddings, control_group_all_embeddings, full_pt_dicts, curr_data_name = get_data(indir, prompt_type, embedding_type)
+        unanswerable_all_embeddings, answerable_all_embeddings, full_pt_dicts, curr_data_name = get_data(indir, prompt_type, embedding_type)
 
 
 
         if embedding_type == "first_hidden_embedding":
-            adversarial_embeddings = [elem.cpu().numpy() for elem in adversarial_all_embeddings]
-            control_group_embeddings = [elem.cpu().numpy() for elem in control_group_all_embeddings]
+            unanswerable_embeddings = [elem.cpu().numpy() for elem in unanswerable_all_embeddings]
+            answerable_embeddings = [elem.cpu().numpy() for elem in answerable_all_embeddings]
         elif aggregation_type == "only_first_tkn":
-            adversarial_embeddings = [elem.squeeze()[0,:].cpu().numpy()  if len(elem.shape)>2 else elem[0,:].cpu().numpy() for elem in adversarial_all_embeddings]
-            control_group_embeddings = [elem.squeeze()[0,:].cpu().numpy()  if len(elem.shape)>2 else elem[0,:].cpu().numpy() for elem in control_group_all_embeddings]
+            unanswerable_embeddings = [elem.squeeze()[0,:].cpu().numpy()  if len(elem.shape)>2 else elem[0,:].cpu().numpy() for elem in unanswerable_all_embeddings]
+            answerable_embeddings = [elem.squeeze()[0,:].cpu().numpy()  if len(elem.shape)>2 else elem[0,:].cpu().numpy() for elem in answerable_all_embeddings]
         elif aggregation_type == "average":
-            adversarial_embeddings = [elem.mean(dim=0).cpu().numpy() for elem in adversarial_all_embeddings]
-            control_group_embeddings = [elem.mean(dim=0).cpu().numpy() for elem in control_group_all_embeddings]
+            unanswerable_embeddings = [elem.mean(dim=0).cpu().numpy() for elem in unanswerable_all_embeddings]
+            answerable_embeddings = [elem.mean(dim=0).cpu().numpy() for elem in answerable_all_embeddings]
         elif aggregation_type == "aggregated":
-            adversarial_instances = [(emb.cpu().numpy(), instance["outputs"][0]) for instance in full_pt_dicts["adversarial"][prompt_type] for emb in adapt_hidden_embeddings(instance)]
-            control_group_instances = [(emb.cpu().numpy(), instance["outputs"][0]) for instance in full_pt_dicts["control_group"][prompt_type] for emb in adapt_hidden_embeddings(instance)]
+            unanswerable_instances = [(emb.cpu().numpy(), instance["outputs"][0]) for instance in full_pt_dicts["unanswerable"][prompt_type] for emb in adapt_hidden_embeddings(instance)]
+            answerable_instances = [(emb.cpu().numpy(), instance["outputs"][0]) for instance in full_pt_dicts["answerable"][prompt_type] for emb in adapt_hidden_embeddings(instance)]
 
-            adversarial_embeddings = [elem[0] for elem in adversarial_instances]
-            control_group_embeddings = [elem[0] for elem in control_group_instances]
+            unanswerable_embeddings = [elem[0] for elem in unanswerable_instances]
+            answerable_embeddings = [elem[0] for elem in answerable_instances]
         else:
             raise Exception(f'aggregation_type can only be any of any of "average", "only_first_tkn" and "aggregated", but got {aggregation_type}')
 
         # Extracting Actual Text Outputs
-        adversarial_outputs = [elem["outputs"][0] for elem in full_pt_dicts["adversarial"][prompt_type]]
-        control_group_outputs = [elem["outputs"][0] for elem in full_pt_dicts["control_group"][prompt_type]]
+        unanswerable_outputs = [elem["outputs"][0] for elem in full_pt_dicts["unanswerable"][prompt_type]]
+        answerable_outputs = [elem["outputs"][0] for elem in full_pt_dicts["answerable"][prompt_type]]
 
 
         # separate questions into "unanswerable" replies and other
-        unanswerable_adversarial = [adversarial_embeddings[i] for i,txt in enumerate(adversarial_outputs) if get_response([txt])=="unanswerable"]
-        answerable_adversarial = [adversarial_embeddings[i] for i,txt in enumerate(adversarial_outputs) if get_response([txt])!="unanswerable"]
+        unanswerable_identifies_as_unanswerable = [unanswerable_embeddings[i] for i,txt in enumerate(unanswerable_outputs) if get_response([txt])=="unanswerable"]
+        unanswerable_identifies_as_answerable = [unanswerable_embeddings[i] for i,txt in enumerate(unanswerable_outputs) if get_response([txt])!="unanswerable"]
 
-        unanswerable_control_group = [control_group_embeddings[i] for i,txt in enumerate(control_group_outputs) if get_response([txt])=="unanswerable"]
-        answerable_control_group = [control_group_embeddings[i] for i,txt in enumerate(control_group_outputs) if get_response([txt])!="unanswerable"]
+        answerable_identified_as_unanswerable = [answerable_embeddings[i] for i,txt in enumerate(answerable_outputs) if get_response([txt])=="unanswerable"]
+        answerable_identified_as_answerable = [answerable_embeddings[i] for i,txt in enumerate(answerable_outputs) if get_response([txt])!="unanswerable"]
 
         # Stack all vectors
-        combined_data = np.vstack((unanswerable_adversarial, answerable_adversarial, unanswerable_control_group, answerable_control_group))
+        combined_data = np.vstack((unanswerable_identifies_as_unanswerable, unanswerable_identifies_as_answerable, answerable_identified_as_unanswerable, answerable_identified_as_answerable))
 
         # Initialize PCA
         pca = PCA(n_components=3)
@@ -251,7 +251,7 @@ def main(args):
 
         curr_outdir = os.path.join(outdir_path, f"{curr_model_name}_{curr_data_name}_3D.html")
         print(f"Saving PCA plot of {curr_model_name} on {curr_data_name} to: {curr_outdir}")
-        create_pca_plot(data_pca, unanswerable_adversarial, answerable_adversarial, unanswerable_control_group, adversarial_embeddings, curr_outdir)
+        create_pca_plot(data_pca, unanswerable_identifies_as_unanswerable, unanswerable_identifies_as_answerable, answerable_identified_as_unanswerable, unanswerable_embeddings, curr_outdir)
 
 
 
