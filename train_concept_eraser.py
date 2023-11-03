@@ -1,11 +1,6 @@
 import numpy as np
 import os
-import pickle
 import argparse
-import logging
-# Set the logging level to INFO
-logging.basicConfig(level=logging.INFO)
-import numpy as np
 import torch
 import pickle
 from concept_erasure import ConceptEraser
@@ -54,18 +49,18 @@ def get_data(indir, prompt_type, dataset, num_instances, aggregation_type):
     return unanswerable_instances, answerable_instances
 
 def main(args):
-    indir = args.indir
-    outdir = args.outdir
-    dataset = args.dataset
-    prompt_type = args.prompt_type
-    outdir = os.path.join(outdir, dataset, prompt_type)
+    outdir = os.path.join(args.outdir, args.dataset, args.prompt_type)
 
     # create outdir
     folder_path = Path(outdir)
     folder_path.mkdir(parents=True, exist_ok=True)
     print(f"classifier saved to {outdir}")
 
-    unanswerable_instances, answerable_instances = get_data(indir, prompt_type, dataset, args.num_instances, args.aggregation_type)
+    unanswerable_instances, answerable_instances = get_data(indir=args.indir, 
+                                                            prompt_type=args.prompt_type, 
+                                                            dataset=args.dataset, 
+                                                            num_instances=args.num_instances, 
+                                                            aggregation_type=args.aggregation_type)
 
     # Combine the instances and create corresponding labels
     unanswerable_labels = np.zeros(len(unanswerable_instances))
@@ -88,12 +83,7 @@ if __name__ == '__main__':
     argparser.add_argument('-o', '--outdir', type=str, required=True, help='path to outdir')
     argparser.add_argument('--dataset', type=str, default="squad", help='prompt type to classify ("squad", "NQ", "musique")')
     argparser.add_argument('--prompt-type', type=str, default="Adversarial", help='prompt type to classify ("Adversarial", "Pseudo-Adversarial", "CoT-Adversarial", "Answerability")')
-    argparser.add_argument('--epochs', type=int, default=500, help='number of epochs')
-    argparser.add_argument('--batch-size', type=int, default=32, help='batch size of train set.')
-    argparser.add_argument('--eval-batch-size', type=int, default=64, help='batch size of dev and test sets.')
     argparser.add_argument('--num-instances', type=int, default=None, help='number of instances to use for training (will take the same amount from the answerable and the un-answerable). If None - will take all.')
-    argparser.add_argument('--save-interval', type=int, default=10, help='how frequently to save model')
-    argparser.add_argument('--eval-interval', type=int, default=10, help='how frequently to evaluate on the devset (in epochs)')
     argparser.add_argument('--aggregation-type', type=str, default="only_first", help='how to aggregate all the hidden layers of all the generated tokens of a single instance (choose from "average" to average them, "union" to treat each of them as an instance, and "only_first" to only take the first token\'s hidden layers).')
     args = argparser.parse_args()
     main(args)

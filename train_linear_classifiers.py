@@ -1,9 +1,5 @@
 import os
-import pickle
 import argparse
-import logging
-# Set the logging level to INFO
-logging.basicConfig(level=logging.INFO)
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -13,14 +9,12 @@ from pathlib import Path
 
 SEED = 42
 
-
 def adapt_hidden_embeddings(instance, embedding_type):
+
     # if the embeddings of all the generation steps were saved in a single matrix, rather than in a list, separate them
     if len(instance[embedding_type][-1].shape) == 2:
         instance[embedding_type] = [instance[embedding_type][0][i,:] for i in range(instance[embedding_type][0].shape[0])]
 
-    
-    
     # removing the paddings
     # Compare all elements to 1
     matches = instance['all_outputs_ids'][0,:].eq(1)
@@ -34,7 +28,6 @@ def adapt_hidden_embeddings(instance, embedding_type):
     filtered_hidden_embedding = instance[embedding_type][:filter_index]
     return filtered_hidden_embedding
 
-
 def get_model_name(indir):
     if "Flan-UL2" in indir:
         curr_model = "Flan-UL2"
@@ -45,7 +38,6 @@ def get_model_name(indir):
     else:
         raise Exception(f"curr model not found in indir: {indir}")
     return curr_model
-
 
 def get_data(indir, prompt_type, embedding_type, dataset, num_instances, aggregation_type):
     data = dict()
@@ -77,18 +69,9 @@ def get_data(indir, prompt_type, embedding_type, dataset, num_instances, aggrega
 
     return unanswerable_instances, answerable_instances
 
-
-
 def main(args):
-    indir = args.indir
-    outdir = args.outdir
-    dataset = args.dataset
-    prompt_type = args.prompt_type
-    embedding_type = args.embedding_type
-    aggregation_type = args.aggregation_type
-    num_instances = args.num_instances
-    model_name = get_model_name(indir)
-    outdir = os.path.join(outdir, dataset, embedding_type, prompt_type, aggregation_type, f"{model_name}_{num_instances}N")
+    model_name = get_model_name(args.indir)
+    outdir = os.path.join(args.outdir, args.dataset, args.embedding_type, args.prompt_type, args.aggregation_type, f"{model_name}_{args.num_instances}N")
 
     # create outdir
     folder_path = Path(outdir)
@@ -96,7 +79,12 @@ def main(args):
     print(f"classifier saved to {outdir}")
 
     # get data
-    unanswerable_instances, answerable_instances = get_data(indir, prompt_type, embedding_type, dataset, num_instances, aggregation_type)
+    unanswerable_instances, answerable_instances = get_data(indir=args.indir, 
+                                                            prompt_type=args.prompt_type, 
+                                                            embedding_type=args.embedding_type, 
+                                                            dataset=args.dataset, 
+                                                            num_instances=args.num_instances, 
+                                                            aggregation_type=args.aggregation_type)
 
     # Combine the instances and create corresponding labels
     unanswerable_labels = np.zeros(len(unanswerable_instances))
@@ -108,11 +96,8 @@ def main(args):
     # Split data into train, validation, and test sets (60% train, 20% validation, 20% test)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=SEED)
 
-
-
     # Train a linear classifier using logistic regression
     clf = LogisticRegression(random_state=SEED)
-
 
     param_grid = {
             'C': [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
@@ -121,17 +106,13 @@ def main(args):
             'max_iter': [1000, 5000]
         }
 
-
     grid_search = GridSearchCV(clf, param_grid, cv=5, scoring='accuracy', refit=True)
     grid_search.fit(X_train, y_train)
-
-
 
     # Log the accuracy of different hyperparameters in the GridSearch
     print("GridSearchCV results:")
     for mean_score, std_score, params in zip(grid_search.cv_results_['mean_test_score'], grid_search.cv_results_['std_test_score'], grid_search.cv_results_['params']):
         print(f"Mean accuracy: {mean_score:.4f}, Std: {std_score:.4f}, Parameters: {params}")
-
 
     # save model
     model_filename = os.path.join(outdir, "best_model.pkl")
@@ -140,23 +121,13 @@ def main(args):
 
     print(f"Best model saved to {model_filename}")
 
-
-
-
-
-
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description="")
     argparser.add_argument('-i', '--indir', type=str, required=True, help='path to data')
     argparser.add_argument('-o', '--outdir', type=str, required=True, help='path to outdir')
     argparser.add_argument('--dataset', type=str, default="squad", help='prompt type to classify ("squad", "NQ", "musique")')
     argparser.add_argument('--prompt-type', type=str, default="Adversarial", help='prompt type to classify ("Adversarial", "Pseudo-Adversarial", "CoT-Adversarial", "Answerability")')
-    argparser.add_argument('--epochs', type=int, default=500, help='number of epochs')
-    argparser.add_argument('--batch-size', type=int, default=32, help='batch size of train set.')
-    argparser.add_argument('--eval-batch-size', type=int, default=64, help='batch size of dev and test sets.')
     argparser.add_argument('--num-instances', type=int, default=None, help='number of instances to use for training (will take the same amount from the answerable and the un-answerable). If None - will take all.')
-    argparser.add_argument('--save-interval', type=int, default=10, help='how frequently to save model')
-    argparser.add_argument('--eval-interval', type=int, default=10, help='how frequently to evaluate on the devset (in epochs)')
     argparser.add_argument('--aggregation-type', type=str, default="only_first_tkn", help='how to aggregate all the hidden layers of all the generated tokens of a single instance (choose from "average" to average them, "union" to treat each of them as an instance, and "only_first_tkn" to only take the first token\'s hidden layers).')
     argparser.add_argument('--embedding-type', type=str, default="last_hidden_embedding", help='which layer to take: any one of "last_hidden_embedding" and "first_hidden_embedding"')
     args = argparser.parse_args()
