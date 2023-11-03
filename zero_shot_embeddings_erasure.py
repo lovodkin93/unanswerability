@@ -12,18 +12,18 @@ import argparse
 from pathlib import Path
 import logging
 from constants import *
+from post_processing.pt_to_benchmarks_evaluate_format import main as pt_to_evaluate_format_converter
 
 # Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)
 
-def get_responses_unanswerable_questions_squad(data_path, args, **kwargs):
+def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, args, **kwargs):
 
     def squad_Passage(full_prompt):
         return full_prompt[full_prompt.index("Passage:"):full_prompt.index("Question:")].replace("Passage:", "").strip()
 
     def squad_Question(full_prompt):
         return full_prompt[full_prompt.index("Question:"):].replace("Question:", "").strip()
-
 
     responses = {"ids":[], 
                  "Adversarial":[], 
@@ -35,7 +35,7 @@ def get_responses_unanswerable_questions_squad(data_path, args, **kwargs):
 
     with open(data_path) as f:
         data = json.load(f)
-    
+        data = data[p_variant][data_type]
     if args.n_instances != None:
         data = data[:args.n_instances]
 
@@ -70,7 +70,7 @@ def get_responses_unanswerable_questions_squad(data_path, args, **kwargs):
         responses["Question"].extend([squad_Question(sample['Adversarial']) for sample in curr_data])
     return responses
 
-def get_responses_unanswerable_questions_NQ(data_path, args, **kwargs):
+def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, args, **kwargs):
 
     def NQ_Passage(full_prompt):
         return full_prompt[full_prompt.index("Passage:"):full_prompt.index("Question:")].replace("Passage:", "").strip()
@@ -89,12 +89,11 @@ def get_responses_unanswerable_questions_NQ(data_path, args, **kwargs):
 
     with open(data_path) as f:
         data = json.load(f)
-    
+        data = data[p_variant][data_type]
     if args.n_instances != None:
         data = data[:args.n_instances]
 
     n_batches = int(np.ceil(len(data) / args.batch_size))
-
     for batch_i in tqdm(range(n_batches)):
         curr_data = data[batch_i*args.batch_size:(batch_i+1)*args.batch_size]
         responses["ids"].extend([sample["example_id"] for sample in curr_data])
@@ -119,7 +118,7 @@ def get_responses_unanswerable_questions_NQ(data_path, args, **kwargs):
         responses["Question"].extend([NQ_Question(sample['Adversarial']) for sample in curr_data])
     return responses
 
-def get_responses_unanswerable_questions_musique(data_path, args, **kwargs):
+def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type, args, **kwargs):
 
     def musique_Context(full_prompt):
         return full_prompt[full_prompt.index("Context:"):full_prompt.index("Question:")].replace("Context:", "").strip()
@@ -137,12 +136,11 @@ def get_responses_unanswerable_questions_musique(data_path, args, **kwargs):
 
     with open(data_path) as f:
         data = json.load(f)
-    
+        data = data[p_variant][data_type]
     if args.n_instances != None:
         data = data[:args.n_instances]
 
     n_batches = int(np.ceil(len(data) / args.batch_size))
-
     for batch_i in tqdm(range(n_batches)):
         curr_data = data[batch_i*args.batch_size:(batch_i+1)*args.batch_size]
         responses["ids"].extend([sample["id"] for sample in curr_data])
@@ -267,33 +265,15 @@ def get_model(args, model_name):
     return {"output_subdir" : model_name, "kwargs":dict(tokenizer=curr_tokenizer, model=curr_model, lm_head=curr_model_head, prompt_suffix=curr_prompt_suffix)}
 
 def get_all_relevant_datasets(args):
+    data_function_map = {"squad" : get_responses_unanswerable_questions_squad,
+                         "NQ" : get_responses_unanswerable_questions_NQ,
+                         "musique" : get_responses_unanswerable_questions_musique}
     data_list = list()
-    if "squad" in args.datasets:
-        if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad})
-        if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad})
-
-    if "NQ" in args.datasets:
-        if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ})
-        if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ})
-
-    if "musique" in args.datasets:
-        if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique})
-        if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique})
+    if not args.only_answerable_instances:
+        data_list += [{"type": "un-answerable", "data_name":dataset, "get_data_function":data_function_map[dataset]} for dataset in args.datasets]
+    if not args.only_unanswerable_instances:
+        data_list += [{"type": "answerable", "data_name":dataset, "get_data_function":data_function_map[dataset]} for dataset in args.datasets]
     return data_list
-
-def create_dir(subdirs):
-    full_subdir = ""
-    for subdir in subdirs:
-        full_subdir = os.path.join(full_subdir, subdir)
-
-        if not os.path.exists(full_subdir):
-            os.makedirs(full_subdir)
 
 def main(args):
     # Load the eraser from the file
@@ -302,16 +282,12 @@ def main(args):
     else:
         with open(args.eraser_dir, "rb") as file:
             eraser = pickle.load(file).to("cuda")
-    
+
     now = datetime.now()
     now_str = now.strftime("%d-%m-%Y_%H:%M:%S")
-    outdir_path = args.outdir if args.outdir else os.path.join("responses_embeddings", "projections", now_str)
-    path = Path(outdir_path)
-    path.mkdir(parents=True, exist_ok=True)
-    logging.info(f'saved to: {outdir_path}')
-
+    outdir_path = args.outdir if args.outdir else os.path.join("generated_outputs", now_str)
+    logging.info(f'saving to: {outdir_path}')
     datasets_list = get_all_relevant_datasets(args)
-
     if args.k_beams_grid_search is None:
         k_beams_list = [args.k_beams]
     else:
@@ -328,21 +304,20 @@ def main(args):
             for k_beams in k_beams_list:
                 for dataset in datasets_list:
                     print(f"model: {model['output_subdir']} data: {dataset['data_name']} type: {dataset['type']} variant: {p_variant} beam: {k_beams}")
-                    
-                    create_dir([outdir_path, model['output_subdir'], "zero_shot", f"k_beams_{k_beams}", p_variant])
+                    # create directory
+                    curr_outdir = os.path.join(outdir_path, model['output_subdir'], "zero_shot", f"k_beams_{k_beams}", p_variant)
+                    path = Path(curr_outdir)
+                    path.mkdir(parents=True, exist_ok=True)
+                    curr_outdir = os.path.join(curr_outdir, f"{dataset['type']}_{dataset['data_name']}_test.pt")
 
-
-                    outdir_suffix = "_all"
-
-                    curr_outdir = os.path.join(outdir_path, model['output_subdir'], "zero_shot", f"k_beams_{k_beams}", p_variant, f"{dataset['type']}_{dataset['data_name']}{outdir_suffix}.pt")
-                    
                     if os.path.exists(curr_outdir):
                         print(f"{curr_outdir} exists! skipping...")
                         continue
                     
-                    data_adversarial_path = fr"generated_prompts/all/zero_shot/{p_variant}/{dataset['data_name']}_{dataset['type']}_all.json"
-                    
-                    responses = dataset['get_data_function'](data_path=data_adversarial_path, 
+                    data_path = fr"data/prompts/{dataset['data_name']}/zero_shot/test.json"
+                    responses = dataset['get_data_function'](data_path=data_path, 
+                                                             p_variant=p_variant,
+                                                             data_type=dataset['type'],
                                                              args=args,
                                                              k_beams=k_beams, 
                                                              tokenizer=model['kwargs']['tokenizer'], 
@@ -351,10 +326,15 @@ def main(args):
                                                              eraser=eraser, 
                                                              only_first_decoding=args.only_first_decoding, 
                                                              prompt_suffix=model['kwargs']['prompt_suffix'])
+                    torch.save(responses, curr_outdir)
 
-                    torch.save(responses, curr_outdir) # and to load it: loaded_dict = torch.load(curr_outdir)
+    # if not only_answerable_instances and not only_unanswerable_instances - namely we have both answerable and answerable prompts - then convert the pt files to the formats adhering to the evaluation scripts
+    if not args.only_answerable_instances and not args.only_unanswerable_instances:
+        pt_to_evaluate_format_converter(indirs=[outdir_path], is_beam_experiment=False)
 
-
+        # if in beams larger than 1 - also run the conversion to the beam relaxation
+        if [k for k in k_beams_list if k>1]:
+            pt_to_evaluate_format_converter(indirs=[outdir_path], is_beam_experiment=True)
 
 
 
@@ -362,8 +342,6 @@ if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description="")
     argparser.add_argument('--outdir', type=str, default=None, help='outdir to save results')
     argparser.add_argument("--models", nargs='+', type=str, default=["Flan-T5-small"], help="which models to send requests to. any from: Flan-UL2, Flan-T5-xxl, OPT-IML, Flan-T5-small, OPT-1-3B and ChatGPT")
-    argparser.add_argument("--adversarial", action='store_true', default=False, help="send adversarial requests.")
-    argparser.add_argument("--control-group", action='store_true', default=False, help="send control group request.")
     argparser.add_argument("--datasets", nargs='+', type=str, default=["squad"], help="which datasets to work on. any from: squad, NQ, musique")
     argparser.add_argument("--n-instances", type=int, default=None, help="number of instances to process")
     argparser.add_argument("--k-beams", type=int, default=1, help="beam size (will also be the number of returned outputs to check \"unanswerable\" from)")
