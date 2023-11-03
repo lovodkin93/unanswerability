@@ -16,7 +16,7 @@ def pt_to_csv_non_beam(indirs):
             for file in files:
                 if not file.endswith("pt"):
                     continue
-                new_subdir = os.path.join(subdir, f"num_return_seq_1")
+                new_subdir = os.path.join(subdir, f"regular_decoding")
 
                 if not os.path.exists(new_subdir):
                     os.makedirs(new_subdir)
@@ -47,7 +47,7 @@ def pt_to_csv_beam(indirs):
                 if not file.endswith("pt"):
                     continue
 
-                new_subdir = os.path.join(subdir, f"locate_unanswerable_in_beams")
+                new_subdir = os.path.join(subdir, f"beam_relaxation")
 
                 if not os.path.exists(new_subdir):
                     os.makedirs(new_subdir)
@@ -64,7 +64,7 @@ def pt_to_csv_beam(indirs):
                 curr_df.to_csv(curr_outdir)
 
 def csv_to_benchmark_evaluate_format(indirs, data_name):
-    eval_dir = f"{data_name}_evaluate_script_format"
+    eval_dir = f"{data_name}_QA_task_format"
 
     for indir in tqdm(indirs):
         for subdir, dirs, files in os.walk(indir):

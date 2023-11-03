@@ -66,7 +66,7 @@ def main(args):
         curr_unanswerable, curr_answerable = pd.DataFrame(), pd.DataFrame()
 
         for subdir, dirs, files in os.walk(curr_indir):
-            if not os.path.basename(subdir) in ["num_return_seq_1", "locate_unanswerable_in_beams"]:
+            if not os.path.basename(subdir) in ["regular_decoding", "beam_relaxation"]:
                 continue
             for filename in files:
                 if not filename.endswith(".csv"):

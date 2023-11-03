@@ -77,7 +77,7 @@ def get_evalulation_outdir(subdir, curr_dataset, outdir_path):
     num_beams = get_num_beams(subdir)
     icl_variant = get_icl_variant(subdir)
 
-    top_or_all_beams = "locate_unanswerable_in_beams" if "locate_unanswerable_in_beams" in subdir else "num_return_seq_1"
+    top_or_all_beams = "beam_relaxation" if "beam_relaxation" in subdir else "regular_decoding"
 
     outdir_path = os.path.join(outdir_path, zero_or_few, model_name, curr_dataset, num_beams, variant, top_or_all_beams)
     if icl_variant != None: # for few-shot there is also icl_example variant
