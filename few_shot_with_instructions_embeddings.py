@@ -358,9 +358,7 @@ def main(args):
                                                                  model=model['kwargs']['model'], 
                                                                  prompt_suffix=model['kwargs']['prompt_suffix'], 
                                                                  return_only_generated_text=args.return_only_generated_text)
-                        
-                        
-                        torch.save(responses, curr_outdir) # and to load it: loaded_dict = torch.load(curr_outdir)
+                        torch.save(responses, curr_outdir)
 
     # if not only_answerable_instances and not only_unanswerable_instances - namely we have both answerable and answerable prompts - then convert the pt files to the formats adhering to the evaluation scripts
     if not args.only_answerable_instances and not args.only_unanswerable_instances:
