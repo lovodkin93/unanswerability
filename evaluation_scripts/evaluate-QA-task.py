@@ -15,7 +15,7 @@ import shutil
 
 def main(args):
 
-    # create tmp dir insie the outdir path for calculations of each of the prompt variants
+    # create tmp dir inside the outdir path for calculations of each of the prompt variants
     outdir_path = args.outdir if args.outdir else "evaluation_results"
     tmp_outdir = os.path.join(outdir_path, "tmp")
     path = Path(tmp_outdir)
