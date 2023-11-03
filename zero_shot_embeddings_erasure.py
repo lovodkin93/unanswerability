@@ -21,15 +21,16 @@ from constants import *
 logging.basicConfig(level=logging.INFO)
 
 
-def squad_Passage(full_prompt):
-    return full_prompt[full_prompt.index("Passage:"):full_prompt.index("Question:")].replace("Passage:", "").strip()
 
-def squad_Question(full_prompt):
-    return full_prompt[full_prompt.index("Question:"):].replace("Question:", "").strip()
+def get_responses_unanswerable_questions_squad(data_path, n_instances, only_hint_prompts, only_adversarial, batch_size, **kwargs):
+
+    def squad_Passage(full_prompt):
+        return full_prompt[full_prompt.index("Passage:"):full_prompt.index("Question:")].replace("Passage:", "").strip()
+
+    def squad_Question(full_prompt):
+        return full_prompt[full_prompt.index("Question:"):].replace("Question:", "").strip()
 
 
-
-def get_responses_unanswerable_questions_squad(data_path, request_function, prompt_prefix, n_instances, only_hint_prompts, only_adversarial, batch_size, **kwargs):
     responses = {"ids":[], "Adversarial":[], "Pseudo-Adversarial":[], "CoT-Adversarial":[], "Answerability":[], "Passage":[], "Question":[]}
     # responses = {"ids":[], "Passage":[], "Question":[]}
 
@@ -39,7 +40,7 @@ def get_responses_unanswerable_questions_squad(data_path, request_function, prom
     if n_instances != None:
         data = data[:n_instances]
 
-    # the control-group doesn't have this parameter
+    # the answerable instances don't have this parameter
     if "Unanswerablity-Reason" in data[0].keys():
         responses["Unanswerablity-Reason"] = []
 
@@ -55,21 +56,21 @@ def get_responses_unanswerable_questions_squad(data_path, request_function, prom
             responses["Adversarial"].extend([""]*batch_size)
             responses["Answerability"].extend([""]*batch_size)
         elif only_adversarial:
-            responses["Adversarial"].extend(request_function([sample['Adversarial'] for sample in curr_data], **kwargs))
+            responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
             responses["Answerability"].extend([""]*batch_size)
         else:
-            responses["Adversarial"].extend(request_function([sample['Adversarial'] for sample in curr_data], **kwargs))
-            responses["Answerability"].extend(request_function([sample['Answerability'] for sample in curr_data], **kwargs))
+            responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
+            responses["Answerability"].extend(HF_request([sample['Answerability'] for sample in curr_data], **kwargs))
         
         if only_adversarial:
             responses["Pseudo-Adversarial"].extend([""]*batch_size)
             responses["CoT-Adversarial"].extend([""]*batch_size)
         else:
             # pseudo-adversarial response
-            responses["Pseudo-Adversarial"].extend(request_function([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
+            responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
             
             # CoT-adversarial response
-            responses["CoT-Adversarial"].extend(request_function([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))
+            responses["CoT-Adversarial"].extend(HF_request([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))
 
         responses["Passage"].extend([squad_Passage(sample['Adversarial']) for sample in curr_data])
         responses["Question"].extend([squad_Question(sample['Adversarial']) for sample in curr_data])
@@ -78,16 +79,22 @@ def get_responses_unanswerable_questions_squad(data_path, request_function, prom
 
 
 
-def NQ_Passage(full_prompt):
-    return full_prompt[full_prompt.index("Passage:"):full_prompt.index("Question:")].replace("Passage:", "").strip()
-
-def NQ_Question(full_prompt):
-    return full_prompt[full_prompt.index("Question:"):].replace("Question:", "").strip()
 
 
 
+def get_responses_unanswerable_questions_NQ(data_path, n_instances, only_hint_prompts, only_adversarial, batch_size, **kwargs):
 
-def get_responses_unanswerable_questions_NQ(data_path, request_function, prompt_prefix, n_instances, only_hint_prompts, only_adversarial, batch_size, **kwargs):
+    def NQ_Passage(full_prompt):
+        return full_prompt[full_prompt.index("Passage:"):full_prompt.index("Question:")].replace("Passage:", "").strip()
+
+    def NQ_Question(full_prompt):
+        return full_prompt[full_prompt.index("Question:"):].replace("Question:", "").strip()
+
+
+
+
+
+
     responses = {"ids":[], "annotation_ids":[], "Adversarial":[], "Pseudo-Adversarial":[], "CoT-Adversarial":[], "Answerability":[], "Passage":[], "Question":[]}
 
     with open(data_path) as f:
@@ -107,21 +114,21 @@ def get_responses_unanswerable_questions_NQ(data_path, request_function, prompt_
             responses["Adversarial"].extend([""]*batch_size)
             responses["Answerability"].extend([""]*batch_size)
         elif only_adversarial:
-            responses["Adversarial"].extend(request_function([sample['Adversarial'] for sample in curr_data], **kwargs))
+            responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
             responses["Answerability"].extend([""]*batch_size)
         else:
-            responses["Adversarial"].extend(request_function([sample['Adversarial'] for sample in curr_data], **kwargs))
-            responses["Answerability"].extend(request_function([sample['Answerability'] for sample in curr_data], **kwargs))
+            responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
+            responses["Answerability"].extend(HF_request([sample['Answerability'] for sample in curr_data], **kwargs))
         
         if only_adversarial:
             responses["Pseudo-Adversarial"].extend([""]*batch_size)
             responses["CoT-Adversarial"].extend([""]*batch_size)
         else:
             # pseudo-adversarial response
-            responses["Pseudo-Adversarial"].extend(request_function([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
+            responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
             
             # CoT-adversarial response
-            responses["CoT-Adversarial"].extend(request_function([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))
+            responses["CoT-Adversarial"].extend(HF_request([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))
 
         responses["Passage"].extend([NQ_Passage(sample['Adversarial']) for sample in curr_data])
         responses["Question"].extend([NQ_Question(sample['Adversarial']) for sample in curr_data])
@@ -129,15 +136,18 @@ def get_responses_unanswerable_questions_NQ(data_path, request_function, prompt_
     return responses
 
 
-def musique_Context(full_prompt):
-    return full_prompt[full_prompt.index("Context:"):full_prompt.index("Question:")].replace("Context:", "").strip()
+def get_responses_unanswerable_questions_musique(data_path, n_instances, only_hint_prompts, only_adversarial, batch_size, **kwargs):
 
-def musique_Question(full_prompt):
-    return full_prompt[full_prompt.index("Question:"):].replace("Question:", "").strip()
+    def musique_Context(full_prompt):
+        return full_prompt[full_prompt.index("Context:"):full_prompt.index("Question:")].replace("Context:", "").strip()
+
+    def musique_Question(full_prompt):
+        return full_prompt[full_prompt.index("Question:"):].replace("Question:", "").strip()
 
 
 
-def get_responses_unanswerable_questions_musique(data_path, request_function, prompt_prefix, n_instances, only_hint_prompts, only_adversarial, batch_size, **kwargs):
+
+
     responses = {"ids":[], "Adversarial":[], "Pseudo-Adversarial":[], "CoT-Adversarial":[], "Answerability":[], "Context":[], "Question":[]}
 
     with open(data_path) as f:
@@ -156,21 +166,21 @@ def get_responses_unanswerable_questions_musique(data_path, request_function, pr
             responses["Adversarial"].extend([""]*batch_size)
             responses["Answerability"].extend([""]*batch_size)
         elif only_adversarial:
-            responses["Adversarial"].extend(request_function([sample['Adversarial'] for sample in curr_data], **kwargs))
+            responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
             responses["Answerability"].extend([""]*batch_size)
         else:
-            responses["Adversarial"].extend(request_function([sample['Adversarial'] for sample in curr_data], **kwargs))
-            responses["Answerability"].extend(request_function([sample['Answerability'] for sample in curr_data], **kwargs))
+            responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
+            responses["Answerability"].extend(HF_request([sample['Answerability'] for sample in curr_data], **kwargs))
         
         if only_adversarial:
             responses["Pseudo-Adversarial"].extend([""]*batch_size)
             responses["CoT-Adversarial"].extend([""]*batch_size)
         else:
             # pseudo-adversarial response
-            responses["Pseudo-Adversarial"].extend(request_function([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
+            responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
             
             # CoT-adversarial response
-            responses["CoT-Adversarial"].extend(request_function([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))
+            responses["CoT-Adversarial"].extend(HF_request([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))
 
         responses["Context"].extend([musique_Context(sample['Adversarial']) for sample in curr_data])
         responses["Question"].extend([musique_Question(sample['Adversarial']) for sample in curr_data])
@@ -179,35 +189,17 @@ def get_responses_unanswerable_questions_musique(data_path, request_function, pr
 
 
 
-def chatGPT_request(content, k_beams, num_return_sequences, **kwargs):
-    time.sleep(15) 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": content}
-        ]
-    )
 
-
-    return response["choices"][0]["message"]["content"]
-
-
-def HF_request(prompts, k_beams, num_return_sequences, tokenizer, model, lm_head, eraser, only_first_decoding, k, is_multi_choice, output_max_length, prompt_suffix, return_only_generated_text):
-
+def HF_request(prompts, k_beams, tokenizer, model, lm_head, eraser, only_first_decoding, prompt_suffix):
     prompts = [f"{p}{prompt_suffix}" for p in prompts]
-    input_ids = tokenizer.batch_encode_plus(
-        prompts, 
-        padding=True,
-        truncation=True,
-        return_tensors="pt")["input_ids"].to(model.device)
-
+    input_ids = tokenizer.batch_encode_plus(prompts, 
+                                            padding=True,
+                                            truncation=True,
+                                            return_tensors="pt")["input_ids"].to(model.device)
     # Set the model to evaluation mode
     model.eval()
-
     # Initialize the decoder input tensor
     decoder_input_ids = [[torch.tensor([[tokenizer.pad_token_id]]), 1.0] for _ in range(k_beams)]
-
 
     lm_head = lm_head.to('cuda')
 
@@ -215,14 +207,12 @@ def HF_request(prompts, k_beams, num_return_sequences, tokenizer, model, lm_head
     output_ids, logits_history, last_hidden_embedding = [[0] for _ in range(k_beams)], [[] for _ in range(k_beams)], [[] for _ in range(k_beams)]
     with torch.no_grad():
         for i in range(20):
-
             all_candidates = []
             for j,sequence in enumerate(decoder_input_ids):
                 curr_decoder_input_ids, prob = sequence
                 curr_output_ids = output_ids[j]
                 curr_logits_history = logits_history[j]
                 curr_last_hidden_embedding = last_hidden_embedding[j]
-
 
                 # Check if the next token is an eos/unk/pad token (if so - no need to generate new beam - keep results and proceed to the next sequence)
                 if i>0 and curr_output_ids[-1] in [tokenizer.eos_token_id]:
@@ -231,8 +221,8 @@ def HF_request(prompts, k_beams, num_return_sequences, tokenizer, model, lm_head
 
                 # Get the logits for the next token
                 embeddings = model(input_ids=input_ids, 
-                            attention_mask=torch.ones_like(input_ids), 
-                            decoder_input_ids=curr_decoder_input_ids).last_hidden_state
+                                   attention_mask=torch.ones_like(input_ids), 
+                                   decoder_input_ids=curr_decoder_input_ids).last_hidden_state
                 embeddings = embeddings[:,-1,:]
                 
                 if eraser != None and (not only_first_decoding or i == 0):
@@ -241,10 +231,8 @@ def HF_request(prompts, k_beams, num_return_sequences, tokenizer, model, lm_head
                 logits = lm_head(embeddings)
                 # Convert the logits to probabilities
                 probabilities = torch.softmax(logits, dim=-1)
-                
                 # take top-k tokens
                 next_token_ids = torch.multinomial(probabilities, num_samples=k_beams)[0]
-
                 new_output_ids = [curr_output_ids + [next_token_id.item()] for next_token_id in next_token_ids]
                 new_logits_history = [curr_logits_history + [logits.to('cpu')] for _ in range(k_beams)]
                 new_last_hidden_embedding = [curr_last_hidden_embedding + [embeddings.to('cpu')] for _ in range(k_beams)]
@@ -258,25 +246,17 @@ def HF_request(prompts, k_beams, num_return_sequences, tokenizer, model, lm_head
             
             # Order all candidates by probability
             ordered_candidates = sorted(all_candidates, key=lambda tup:tup[-1], reverse=True)
-        
-
             # Select k best
             filtered_candidates = ordered_candidates[:k_beams]
-
             decoder_input_ids = [[cand[3], cand[4]] for cand in filtered_candidates]
             output_ids = [cand[0] for cand in filtered_candidates]
             logits_history = [cand[1] for cand in filtered_candidates]
             last_hidden_embedding = [cand[2] for cand in filtered_candidates]
 
-
-
-
-
     output_text = [tokenizer.decode(elem, skip_special_tokens=True) for elem in output_ids]
     all_outputs_ids = pad_sequence([torch.tensor(l) for l in output_ids], batch_first=True, padding_value=0)
     output_logits = [torch.cat(elem, dim=0) for elem in logits_history]   
     output_last_hidden_embedding = [torch.cat(elem, dim=0) for elem in last_hidden_embedding]   
-
     return_dicts =  [{"outputs":output_text,
                       "all_outputs_ids": all_outputs_ids,
                       "full_logits": output_logits,
@@ -284,17 +264,9 @@ def HF_request(prompts, k_beams, num_return_sequences, tokenizer, model, lm_head
     return return_dicts
 
 
-def get_all_relevant_models(args, model_name):
+def get_model(args, model_name):
 
     models_list = list()
-    if model_name == "ChatGPT":
-        if args.openAI_key == None:
-            with open("openAI_api_key/openAI_api_key.txt", "r") as f1:
-                openai.api_key = f1.read()
-        else:
-                openai.api_key = args.openAI_key
-        return {"output_subdir":"chatGPT", "request_function":chatGPT_request, "kwargs":dict()}
-
     if model_name == "Flan-UL2":
         tokenizer_UL2 = AutoTokenizer.from_pretrained("google/flan-ul2", model_max_length=args.model_max_length)
         # max_memory_dict = {0:'40GiB',1:'40GiB'}
@@ -394,25 +366,26 @@ def get_all_relevant_models(args, model_name):
     return models_list
 
 
+
 def get_all_relevant_datasets(args):
     data_list = list()
     if "squad" in args.datasets:
         if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad, "is_multi_choice":False})
+            data_list.append({"type": "adversarial", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad})
         if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad, "is_multi_choice":False})
+            data_list.append({"type": "control_group", "data_name":"squad", "get_data_function":get_responses_unanswerable_questions_squad})
 
     if "NQ" in args.datasets:
         if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ, "is_multi_choice":False})
+            data_list.append({"type": "adversarial", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ})
         if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ, "is_multi_choice":False})
+            data_list.append({"type": "control_group", "data_name":"NQ", "get_data_function":get_responses_unanswerable_questions_NQ})
 
     if "musique" in args.datasets:
         if args.adversarial:
-            data_list.append({"type": "adversarial", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique, "is_multi_choice":False})
+            data_list.append({"type": "adversarial", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique})
         if args.control_group:
-            data_list.append({"type": "control_group", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique, "is_multi_choice":False})
+            data_list.append({"type": "control_group", "data_name":"musique", "get_data_function":get_responses_unanswerable_questions_musique})
     return data_list
 
 def create_dir(subdirs):
@@ -447,57 +420,47 @@ def main(args):
         k_beams_list = [args.k_beams]
     else:
         k_beams_list = json.loads(args.k_beams_grid_search)
-    
-    if args.k_steps_grid_search is None:
-        k_steps_list = [args.k_steps]
-    else:
-        k_steps_list = json.loads(args.k_steps_grid_search)
-
 
     model = None
-    for k_steps in k_steps_list:
-        for model_name in args.models:
-            if model: # free up memory to enable loading the next model
-                del model['kwargs']['model']
-                gc.collect()
-                torch.cuda.empty_cache()        
-            model = get_all_relevant_models(args, model_name)
-            for p_variant in args.prompt_variant:
-                for k_beams in k_beams_list:
-                    for dataset in datasets_list:
-                        num_return_sequences = k_beams if args.num_return_sequences == None else args.num_return_sequences
-                        print(f"model: {model['output_subdir']} data: {dataset['data_name']} type: {dataset['type']} variant: {p_variant} beam: {k_beams}")
-                        
-                        create_dir([outdir_path, model['output_subdir'], "zero_shot", f"k_beams_{k_beams}_num_return_seq_{num_return_sequences}", p_variant, f"k_{k_steps}"])
+    for model_name in args.models:
+        if model: # free up memory to enable loading the next model
+            del model['kwargs']['model']
+            gc.collect()
+            torch.cuda.empty_cache()        
+        model = get_model(args, model_name)
+        for p_variant in args.prompt_variant:
+            for k_beams in k_beams_list:
+                for dataset in datasets_list:
+                    print(f"model: {model['output_subdir']} data: {dataset['data_name']} type: {dataset['type']} variant: {p_variant} beam: {k_beams}")
+                    
+                    create_dir([outdir_path, model['output_subdir'], "zero_shot", f"k_beams_{k_beams}", p_variant])
 
-                        if args.trainset:
-                            outdir_suffix = "_trainset_filtered"
-                        if args.all_instances:
-                            outdir_suffix = "_all"
-                        elif args.unfiltered_instances:
-                            outdir_suffix = "_unfiltered"
-                        else:
-                            outdir_suffix = ""
-                        curr_outdir = os.path.join(outdir_path, model['output_subdir'], "zero_shot", f"k_beams_{k_beams}_num_return_seq_{num_return_sequences}", p_variant, f"k_{k_steps}", f"{dataset['type']}_{dataset['data_name']}_embeddings{outdir_suffix}_k_beams_{k_beams}_num_return_seq_{num_return_sequences}.pt")
-                        
-                        if os.path.exists(curr_outdir):
-                            print(f"{curr_outdir} exists! skipping...")
-                            continue
-                        
-                        if args.trainset:
-                            data_adversarial_path = fr"generated_prompts/train_set/filtered/zero_shot/{p_variant}/{dataset['data_name']}_trainset_{dataset['type']}_filtered.json"
-                        elif args.all_instances:
-                            data_adversarial_path = fr"generated_prompts/all/zero_shot/{p_variant}/{dataset['data_name']}_{dataset['type']}_all.json"
-                        elif args.unfiltered_instances:
-                            data_adversarial_path = fr"generated_prompts/unfiltered/zero_shot/{p_variant}/{dataset['data_name']}_{dataset['type']}_unfiltered.json"
-                        else:
-                            data_adversarial_path = fr"generated_prompts/filtered/zero_shot/{p_variant}/{dataset['data_name']}_{dataset['type']}_filtered.json"
-                        
-                        if model['kwargs']:
-                            responses = dataset['get_data_function'](data_path=data_adversarial_path, request_function=model['request_function'], prompt_prefix="", output_max_length=args.output_max_length, n_instances=args.n_instances, k_beams = k_beams, batch_size=args.batch_size, num_return_sequences=num_return_sequences, only_hint_prompts=args.only_hint_prompts, only_adversarial=args.only_adversarial, tokenizer=model['kwargs']['tokenizer'], model=model['kwargs']['model'], lm_head = model['kwargs']['lm_head'], eraser=eraser, only_first_decoding=args.only_first_decoding, k=k_steps, prompt_suffix=model['kwargs']['prompt_suffix'], is_multi_choice=dataset["is_multi_choice"], return_only_generated_text=args.return_only_generated_text)
-                        else:
-                            responses = dataset['get_data_function'](data_path=data_adversarial_path, request_function=model['request_function'], n_instances=args.n_instances, only_hint_prompts=args.only_hint_prompts, only_adversarial=args.only_adversarial, prompt_prefix="", is_multi_choice=dataset["is_multi_choice"])
-                        torch.save(responses, curr_outdir) # and to load it: loaded_dict = torch.load(curr_outdir)
+                    if args.trainset:
+                        outdir_suffix = "_trainset_filtered"
+                    if args.all_instances:
+                        outdir_suffix = "_all"
+                    elif args.unfiltered_instances:
+                        outdir_suffix = "_unfiltered"
+                    else:
+                        outdir_suffix = ""
+                    curr_outdir = os.path.join(outdir_path, model['output_subdir'], "zero_shot", f"k_beams_{k_beams}", p_variant, f"{dataset['type']}_{dataset['data_name']}{outdir_suffix}.pt")
+                    
+                    if os.path.exists(curr_outdir):
+                        print(f"{curr_outdir} exists! skipping...")
+                        continue
+                    
+                    if args.trainset:
+                        data_adversarial_path = fr"generated_prompts/train_set/filtered/zero_shot/{p_variant}/{dataset['data_name']}_trainset_{dataset['type']}_filtered.json"
+                    elif args.all_instances:
+                        data_adversarial_path = fr"generated_prompts/all/zero_shot/{p_variant}/{dataset['data_name']}_{dataset['type']}_all.json"
+                    elif args.unfiltered_instances:
+                        data_adversarial_path = fr"generated_prompts/unfiltered/zero_shot/{p_variant}/{dataset['data_name']}_{dataset['type']}_unfiltered.json"
+                    else:
+                        data_adversarial_path = fr"generated_prompts/filtered/zero_shot/{p_variant}/{dataset['data_name']}_{dataset['type']}_filtered.json"
+                    
+                    responses = dataset['get_data_function'](data_path=data_adversarial_path, n_instances=args.n_instances, k_beams = k_beams, batch_size=args.batch_size, only_hint_prompts=args.only_hint_prompts, only_adversarial=args.only_adversarial, tokenizer=model['kwargs']['tokenizer'], model=model['kwargs']['model'], lm_head = model['kwargs']['lm_head'], eraser=eraser, only_first_decoding=args.only_first_decoding, prompt_suffix=model['kwargs']['prompt_suffix'])
+
+                    torch.save(responses, curr_outdir) # and to load it: loaded_dict = torch.load(curr_outdir)
 
 
 
@@ -505,8 +468,6 @@ def main(args):
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description="")
-    argparser.add_argument("--ChatGPT", action='store_true', default=False, help="send requests to ChatGPT.")
-    argparser.add_argument('--openAI-key', type=str, default=None, help='API key of OpenAI.')
     argparser.add_argument('--outdir', type=str, default=None, help='outdir to save results')
     argparser.add_argument("--models", nargs='+', type=str, default=["Flan-T5-small"], help="which models to send requests to. any from: Flan-UL2, Flan-T5-xxl, OPT-IML, Flan-T5-small, OPT-1-3B and ChatGPT")
     argparser.add_argument("--adversarial", action='store_true', default=False, help="send adversarial requests.")
@@ -517,20 +478,14 @@ if __name__ == '__main__':
     argparser.add_argument("--n-instances", type=int, default=None, help="number of instances to process")
     argparser.add_argument("--k-beams", type=int, default=1, help="beam size (will also be the number of returned outputs to check \"unanswerable\" from)")
     argparser.add_argument("--k-beams-grid-search", type=str, default=None, help="grid search on the k-beams. Will overrun \"--k-beams\". Need to pass as a list (e.g. --k-beams-grid-search [4,5,6])")
-    argparser.add_argument("--num-return-sequences", type=int, default=None, help="number of returned sequences, in which to check if there is unaswerability (if None - will equal k_beam).")
     argparser.add_argument("--prompt-variant", nargs='+', type=str, default=["variant1"], help="prompt variant list (any of variant1, variant2, variant3).")
     argparser.add_argument("--only-hint-prompts", action='store_true', default=False, help="whether to pass only the prompts with hints (pseudo, CoT, NA fourth answers).")
     argparser.add_argument("--only-adversarial", action='store_true', default=False, help="whether to pass only the Adversarial prompts (also for control group).")
-    argparser.add_argument("--return-only-generated-text", action='store_true', default=False, help="whether to return only the generated text, without the logits (in cases of OOM)")
-
     argparser.add_argument("--batch-size", type=int, default=1, help="size of batch.")
     argparser.add_argument("--cuda", action='store_true', default=False, help="whether to run it on the the GPUs or the CPUs.")
     argparser.add_argument("--model-max-length", type=int, default=2048, help="max input length of model (for datasets like NQ where inputs are very long).")
-    argparser.add_argument("--output-max-length", type=int, default=100, help="max output length.")
     argparser.add_argument("--trainset", action='store_true', default=False, help="whether the data is the trainset (for classifiers)")
     argparser.add_argument("--eraser-dir", type=str, required=True, help="path to eraser.")
-    argparser.add_argument("--k-steps", type=int, default=10, help="number of steps in the direction of the gradient.")
-    argparser.add_argument("--k-steps-grid-search", type=str, default=None, help="grid search on the k-step. Will overrun \"--k-steps\". Need to pass as a list (e.g. --k-steps-grid-search [50,60,70])")
     argparser.add_argument("--no-eraser", action='store_true', default=False, help="do not load eraser (for debugging)")
     argparser.add_argument("--only-first-decoding", action='store_true', default=False, help="perform erasure only on first decoding step.")
 
