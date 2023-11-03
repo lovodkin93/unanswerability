@@ -223,7 +223,6 @@ def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suf
                                             padding=True,
                                             truncation=True,
                                             return_tensors="pt")["input_ids"].to(model.device)
-    
     outputs = model.generate(input_ids, 
                              num_return_sequences=k_beams, 
                              max_new_tokens=output_max_length, 
@@ -232,8 +231,8 @@ def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suf
                              return_dict_in_generate=True, 
                              num_beams=k_beams, 
                              early_stopping=True)
-    
     outputs_logits = [s.to("cpu") for s in outputs.scores]
+
     if "decoder_hidden_states" in outputs.keys(): # in the case of encoder-decoder models (Flan-T5-xxl and Flan-UL2)
         outputs_last_hidden_embeddings = [s[-1][:,-1,:].to("cpu") for s in outputs.decoder_hidden_states]
     else: # in the case of decoder-only models (OPT-IML)
@@ -247,7 +246,6 @@ def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suf
     decoded_outputs = tokenizer.batch_decode(outputs_sequences, skip_special_tokens=True)
 
     batch_size = int(len(decoded_outputs)/k_beams)
-
     return_dicts = []
     for batch_i in range(batch_size):
         curr_return_dict = {"outputs":decoded_outputs[batch_i*k_beams:(batch_i+1)*k_beams]}
@@ -317,11 +315,9 @@ def get_all_relevant_datasets(args):
 def main(args):
     now = datetime.now()
     now_str = now.strftime("%d-%m-%Y_%H:%M:%S")
-    outdir_path = args.outdir if args.outdir else os.path.join("responses_embeddings", "k-beams", now_str)
+    outdir_path = args.outdir if args.outdir else os.path.join("generated_outputs", now_str)
     logging.info(f'saving to: {outdir_path}')
-
     datasets_list = get_all_relevant_datasets(args)
-
     if args.k_beams_grid_search is None:
         k_beams_list = [args.k_beams]
     else:

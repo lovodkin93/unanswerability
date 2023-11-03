@@ -249,7 +249,6 @@ def get_model(args, model_name):
                                                                torch_dtype=torch.float16)            
     return {"output_subdir" : model_name, "kwargs":dict(tokenizer=curr_tokenizer, model=curr_model, prompt_suffix=curr_prompt_suffix)}
 
-
 def get_all_relevant_datasets(args):
     data_function_map = {"squad" : get_responses_unanswerable_questions_squad,
                          "NQ" : get_responses_unanswerable_questions_NQ,
@@ -268,6 +267,7 @@ def main(args):
     logging.info(f'saving to: {outdir_path}')
     datasets_list = get_all_relevant_datasets(args)
     k_beams_list = [args.k_beams] if args.k_beams_grid_search is None else json.loads(args.k_beams_grid_search)
+
     model = None
     for model_name in args.models:
         if model: # free up memory to enable loading the next model
