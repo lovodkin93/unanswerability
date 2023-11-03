@@ -50,7 +50,6 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, 
         if "Unanswerablity-Reason" in data[0].keys():
             responses["Unanswerablity-Reason"].extend([sample["Unanswerablity-Reason"] for sample in curr_data])
 
-
         responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
         responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
         
