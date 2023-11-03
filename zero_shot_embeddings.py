@@ -46,8 +46,11 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, 
     for batch_i in tqdm(range(n_batches)):
         curr_data = data[batch_i*args.batch_size:(batch_i+1)*args.batch_size]
         responses["ids"].extend([sample["id"] for sample in curr_data])
+
         responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
         responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
+        
+        # CoT-like prompt
         if args.CoT_prompt:
             responses["CoT-Adversarial"].extend(HF_request([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))
         else:
@@ -61,7 +64,6 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, 
 
         responses["Passage"].extend([squad_Passage(sample['Adversarial']) for sample in curr_data])
         responses["Question"].extend([squad_Question(sample['Adversarial']) for sample in curr_data])
-
     return responses
 
 def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, args, **kwargs):
@@ -98,6 +100,7 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, arg
         responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
         responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
 
+        # CoT-like prompt
         if args.CoT_prompt:
             responses["CoT-Adversarial"].extend(HF_request([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))   
         else:
@@ -111,7 +114,6 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, arg
 
         responses["Passage"].extend([NQ_Passage(sample['Adversarial']) for sample in curr_data])
         responses["Question"].extend([NQ_Question(sample['Adversarial']) for sample in curr_data])
-
     return responses
 
 def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type, args, **kwargs):
@@ -146,6 +148,7 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type
         responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
         responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
 
+        # CoT-like prompt
         if args.CoT_prompt:
             responses["CoT-Adversarial"].extend(HF_request([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))
         else:       
