@@ -58,7 +58,7 @@ To evaluate the generated texts, run:
 python -m evaluation_scripts.evaluate --indirs <INDIRS> --outdir /path/to/outdir 
 ```
 
-Where `<INDIRS>` should be all the `outdirs` passed to either one of `zero_shot_embeddings.py` or `few_shot_with_instructions_embeddings.py` (separated by a single space). This will save under `/path/to/outdir` a csv file `QA-task-results.csv` with the results on the QA task for each of the prompt types (e.g., `Adversarial` or `Pseudo-Adversarial`), and an excel file `unanswerability_classification_results.xlsx`, with the unanswerability classification results for each of the prompt types. 
+Where `<INDIRS>` should be all the `outdirs` passed to either one of `zero_shot_embeddings.py` or `few_shot_with_instructions_embeddings.py` (separated by a single space). This will save under `/path/to/outdir` a csv file `QA-task-results.csv` with the results on the QA task for each of the prompt types (e.g., `Regular-Prompt` or `Hint-Prompt`), and an excel file `unanswerability_classification_results.xlsx`, with the unanswerability classification results for each of the prompt types. 
 
 Additionally, to get the results on the development set, add the parameter `--devset`.
 
@@ -92,7 +92,7 @@ To train the answerability linear classifiers, run:
 python train_linear_classifiers.py --indir <INDIR> --outdir /path/to/outdir --dataset <DATASET> --prompt-type <PROMPT_TYPE> --epochs 100 --batch-size 16 --num-instances 1000
 ```
 
-where `<INDIR>` is the path to the directory with the pt files of <ins>the train set</ins>, `<DATASET>` should be replaced by either one of `squad`, `NQ`, `musique` and `<PROMPT_TYPE>` should be either `Adversarial` or `Pseudo-Adversarial`.
+where `<INDIR>` is the path to the directory with the pt files of <ins>the train set</ins>, `<DATASET>` should be replaced by either one of `squad`, `NQ`, `musique` and `<PROMPT_TYPE>` should be either `Regular-Prompt` or `Hint-Prompt`.
 
 Additionally, to train a classifier on the <ins>first</ins> hidden layer of the first generated token, also pass `--embedding-type first_hidden_embedding`.
 
@@ -104,7 +104,7 @@ To evaluate the answerability linear classifiers, run:
 python evaluation_scripts/eval_linear_classifiers.py --indir <DATA_INDIR> --classifier-dir <CLASSIFIER_INDIR> --dataset <DATASET> --prompt-type <PROMPT_TYPE> --embedding-type <EMBEDDING_TYPE>
 ```
 
-where `<DATA_INDIR>` is the path to the directory with the pt files of <ins>the test set</ins>, `<CLASSIFIER_INDIR>` is the path to the trained linear classifier, `<DATASET>` should be replaced by either one of `squad`, `NQ`, `musique` and should represent the dataset of the test set, `<PROMPT_TYPE>` should be either `Adversarial` or `Pseudo-Adversarial` and `<EMBEDDING_TYPE>` should be either `first_hidden_embedding` or `last_hidden_embedding`.
+where `<DATA_INDIR>` is the path to the directory with the pt files of <ins>the test set</ins>, `<CLASSIFIER_INDIR>` is the path to the trained linear classifier, `<DATASET>` should be replaced by either one of `squad`, `NQ`, `musique` and should represent the dataset of the test set, `<PROMPT_TYPE>` should be either `Regular-Prompt` or `Hint-Prompt` and `<EMBEDDING_TYPE>` should be either `first_hidden_embedding` or `last_hidden_embedding`.
 
 #### Visualize Embedding Space
 To visualize the embedding space, run:
@@ -113,7 +113,7 @@ To visualize the embedding space, run:
 python figures_generation/PCA_plots_generation.py -i /path/to/folder/with/pt_files -o /path/to/outdir --prompt-type <PROMPT_TYPE> 
 ```
 
-where `<PROMPT_TYPE>` should be either `Adversarial` or `Pseudo-Adversarial`. The generated 3-D PCA plots of the embedding space will be saved under `/path/to/outdir/last_hidden_embedding/only_first_tkn/<PROMPT_TYPE>`.
+where `<PROMPT_TYPE>` should be either `Regular-Prompt` or `Hint-Prompt`. The generated 3-D PCA plots of the embedding space will be saved under `/path/to/outdir/last_hidden_embedding/only_first_tkn/<PROMPT_TYPE>`.
 
 ### Answerability Subspace Erasure
 To perform this experiment, we first need to create a separate conda env. For that, set the `prefix` variable in `subspace_erasure.yml` to your `path/to/anaconda3/envs/subspace_erasure` location, and then run:
@@ -130,7 +130,7 @@ Once you have the embeddings of the **train set** instances, we will start by tr
 python train_concept_eraser.py --indir <INDIR> --outdir /path/to/outdir --dataset <DATASET> --prompt-type <PROMPT_TYPE> --epochs 500 --batch-size 16 --num-instances 1000
 ```
 
-where `<INDIR>` is the path to the directory with the pt files of <ins>the train set</ins>, `<DATASET>` should be replaced by either one of `squad`, `NQ`, `musique` and `<PROMPT_TYPE>` should be either `Adversarial` or `Pseudo-Adversarial`.
+where `<INDIR>` is the path to the directory with the pt files of <ins>the train set</ins>, `<DATASET>` should be replaced by either one of `squad`, `NQ`, `musique` and `<PROMPT_TYPE>` should be either `Regular-Prompt` or `Hint-Prompt`.
 
 Once the training is finished, you will find the trained eraser under `/path/to/outdir/<DATASET>/<PROMPT_TYPE>`.
 

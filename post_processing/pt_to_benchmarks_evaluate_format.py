@@ -28,7 +28,7 @@ def pt_to_csv_non_beam(indirs):
                 for key,value in curr_data.items():
                     if len(value)>0 and type(value[0]) == dict:
                         curr_df_dict[key] = [elem["outputs"][0] for elem in value]
-                    elif any(r for r in value): # if all results are empty strings - this the case when only the "hint" prompts were sent, and then the "Adversarial" and "Answerability" weren't sent and can be omitted
+                    elif any(r for r in value): # if all results are empty strings - this the case when only the "hint" prompts were sent, and then the "Regular-Prompt" and "Answerability" weren't sent and can be omitted
                         curr_df_dict[key] = value
                 curr_df = pd.DataFrame(curr_df_dict)
                 curr_df.to_csv(curr_outdir)
@@ -82,7 +82,7 @@ def csv_to_benchmark_evaluate_format(indirs, data_name):
                         if not prompt_type in curr_df.columns:
                             continue
                         if prompt_type == "Answerability":
-                            is_answerable_results = ["unanswerable" if "unanswerable" in str(row[prompt_type]).lower() else curr_df.iloc[i]["Adversarial"] for i, row in curr_df.iterrows()]
+                            is_answerable_results = ["unanswerable" if "unanswerable" in str(row[prompt_type]).lower() else curr_df.iloc[i]["Regular-Prompt"] for i, row in curr_df.iterrows()]
                             curr_out_dict = {f'{row["ids"]}{id_suffix}'.strip(): is_answerable_results[i] for i, row in curr_df.iterrows()}
                         else:
                             curr_out_dict = {f'{row["ids"]}{id_suffix}'.strip(): row[prompt_type] for _, row in curr_df.iterrows()}

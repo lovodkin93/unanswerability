@@ -24,9 +24,9 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, 
         return full_prompt[full_prompt.index("Question:"):].replace("Question:", "").strip()
 
     responses = {"ids":[], 
-                 "Adversarial":[], 
-                 "Pseudo-Adversarial":[], 
-                 "CoT-Adversarial":[], 
+                 "Regular-Prompt":[], 
+                 "Hint-Prompt":[], 
+                 "CoT-Prompt":[], 
                  "Answerability":[], 
                  "Passage":[], 
                  "Question":[]}
@@ -50,14 +50,14 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, 
         if "Unanswerablity-Reason" in data[0].keys():
             responses["Unanswerablity-Reason"].extend([sample["Unanswerablity-Reason"] for sample in curr_data])
 
-        responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
-        responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
+        responses["Regular-Prompt"].extend(HF_request([sample['Regular-Prompt'] for sample in curr_data], **kwargs))
+        responses["Hint-Prompt"].extend(HF_request([sample['Hint-Prompt'] for sample in curr_data], **kwargs))
         
         # CoT-like prompt
         if args.CoT_prompt:
-            responses["CoT-Adversarial"].extend(HF_request([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))
+            responses["CoT-Prompt"].extend(HF_request([sample['CoT-Prompt'] for sample in curr_data], **kwargs))
         else:
-            responses["CoT-Adversarial"].extend([""]*args.batch_size)
+            responses["CoT-Prompt"].extend([""]*args.batch_size)
         
         # Binary Answerability prompts ("Is it answerable?")
         if args.binary_answerability_prompt:
@@ -65,8 +65,8 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, 
         else:
             responses["Answerability"].extend([""]*args.batch_size)
 
-        responses["Passage"].extend([squad_Passage(sample['Adversarial']) for sample in curr_data])
-        responses["Question"].extend([squad_Question(sample['Adversarial']) for sample in curr_data])
+        responses["Passage"].extend([squad_Passage(sample['Regular-Prompt']) for sample in curr_data])
+        responses["Question"].extend([squad_Question(sample['Regular-Prompt']) for sample in curr_data])
     return responses
 
 def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, args, **kwargs):
@@ -79,9 +79,9 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, arg
 
     responses = {"ids":[], 
                  "annotation_ids":[], 
-                 "Adversarial":[], 
-                 "Pseudo-Adversarial":[], 
-                 "CoT-Adversarial":[], 
+                 "Regular-Prompt":[], 
+                 "Hint-Prompt":[], 
+                 "CoT-Prompt":[], 
                  "Answerability":[], 
                  "Passage":[], 
                  "Question":[]}
@@ -100,14 +100,14 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, arg
         responses["ids"].extend([sample["example_id"] for sample in curr_data])
         responses["annotation_ids"].extend([sample["annotation_id"] for sample in curr_data])
 
-        responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
-        responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
+        responses["Regular-Prompt"].extend(HF_request([sample['Regular-Prompt'] for sample in curr_data], **kwargs))
+        responses["Hint-Prompt"].extend(HF_request([sample['Hint-Prompt'] for sample in curr_data], **kwargs))
 
         # CoT-like prompt
         if args.CoT_prompt:
-            responses["CoT-Adversarial"].extend(HF_request([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))   
+            responses["CoT-Prompt"].extend(HF_request([sample['CoT-Prompt'] for sample in curr_data], **kwargs))   
         else:
-            responses["CoT-Adversarial"].extend([""]*args.batch_size)
+            responses["CoT-Prompt"].extend([""]*args.batch_size)
         
         # Binary Answerability prompts ("Is it answerable?")
         if args.binary_answerability_prompt:
@@ -115,8 +115,8 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, arg
         else:
             responses["Answerability"].extend([""]*args.batch_size)
 
-        responses["Passage"].extend([NQ_Passage(sample['Adversarial']) for sample in curr_data])
-        responses["Question"].extend([NQ_Question(sample['Adversarial']) for sample in curr_data])
+        responses["Passage"].extend([NQ_Passage(sample['Regular-Prompt']) for sample in curr_data])
+        responses["Question"].extend([NQ_Question(sample['Regular-Prompt']) for sample in curr_data])
     return responses
 
 def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type, args, **kwargs):
@@ -128,9 +128,9 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type
         return full_prompt[full_prompt.index("Question:"):].replace("Question:", "").strip()
 
     responses = {"ids":[], 
-                 "Adversarial":[], 
-                 "Pseudo-Adversarial":[], 
-                 "CoT-Adversarial":[], 
+                 "Regular-Prompt":[], 
+                 "Hint-Prompt":[], 
+                 "CoT-Prompt":[], 
                  "Answerability":[], 
                  "Context":[], 
                  "Question":[]}
@@ -148,14 +148,14 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type
         curr_data = data[batch_i*args.batch_size:(batch_i+1)*args.batch_size]
         responses["ids"].extend([sample["id"] for sample in curr_data])
 
-        responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
-        responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
+        responses["Regular-Prompt"].extend(HF_request([sample['Regular-Prompt'] for sample in curr_data], **kwargs))
+        responses["Hint-Prompt"].extend(HF_request([sample['Hint-Prompt'] for sample in curr_data], **kwargs))
 
         # CoT-like prompt
         if args.CoT_prompt:
-            responses["CoT-Adversarial"].extend(HF_request([sample['CoT-Adversarial'] for sample in curr_data], **kwargs))
+            responses["CoT-Prompt"].extend(HF_request([sample['CoT-Prompt'] for sample in curr_data], **kwargs))
         else:       
-            responses["CoT-Adversarial"].extend([""]*args.batch_size)
+            responses["CoT-Prompt"].extend([""]*args.batch_size)
 
         # Binary Answerability prompts ("Is it answerable?")
         if args.binary_answerability_prompt:
@@ -163,8 +163,8 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type
         else:
             responses["Answerability"].extend([""]*args.batch_size)
 
-        responses["Context"].extend([musique_Context(sample['Adversarial']) for sample in curr_data])
-        responses["Question"].extend([musique_Question(sample['Adversarial']) for sample in curr_data])
+        responses["Context"].extend([musique_Context(sample['Regular-Prompt']) for sample in curr_data])
+        responses["Question"].extend([musique_Question(sample['Regular-Prompt']) for sample in curr_data])
     return responses
 
 def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suffix, return_only_generated_text, return_first_layer):

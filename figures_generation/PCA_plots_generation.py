@@ -193,7 +193,7 @@ def create_pca_plot(data_pca, unanswerable_identifies_as_unanswerable, unanswera
 
 def main(args):
     aggregation_type = args.aggregation_type #"only_first_tkn" 
-    prompt_type = args.prompt_type # "Pseudo-Adversarial"
+    prompt_type = args.prompt_type # "Hint-Prompt"
     embedding_type = args.embedding_type # "first_hidden_embedding" 
     indirs = args.indirs #["../responses_embeddings/k-beams/22-06-2023_12:26:12/OPT"]
 
@@ -259,7 +259,7 @@ if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description="")
     argparser.add_argument('-i', '--indirs', nargs='+', type=str, required=True, help='path to data')
     argparser.add_argument('-o', '--outdir', type=str, required=True, help='path to outdir')
-    argparser.add_argument('--prompt-type', type=str, default="Adversarial", help='prompt type to classify ("Adversarial" or "Pseudo-Adversarial")')
+    argparser.add_argument('--prompt-type', type=str, default="Regular-Prompt", help='prompt type to classify ("Regular-Prompt" or "Hint-Prompt")')
     argparser.add_argument('--aggregation-type', type=str, default="only_first_tkn", help='how to aggregate all the hidden layers of all the generated tokens of a single instance (choose from "average" to average them, "union" to treat each of them as an instance, and "only_first_tkn" to only take the first token\'s hidden layers).')
     argparser.add_argument('--embedding-type', type=str, default="last_hidden_embedding", help='which layer to take: any one of "last_hidden_embedding" and "first_hidden_embedding"')
     args = argparser.parse_args()

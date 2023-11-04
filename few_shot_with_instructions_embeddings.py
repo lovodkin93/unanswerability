@@ -25,8 +25,8 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, icl_variant
     batch_size = args.batch_size
 
     responses = {"ids":[], 
-                 "Adversarial":[], "Adversarial-CoT":[],
-                 "Pseudo-Adversarial":[], "Pseudo-Adversarial-CoT":[],
+                 "Regular-Prompt":[], "Regular-Prompt-CoT":[],
+                 "Hint-Prompt":[], "Hint-Prompt-CoT":[],
                  "Ablation1":[], "Ablation1-CoT":[],
                  "Ablation2":[], "Ablation2-CoT":[],
                  "Answerability":[], "Answerability-CoT":[],
@@ -51,20 +51,20 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, icl_variant
         if "Unanswerablity-Reason" in data[0].keys():
             responses["Unanswerablity-Reason"].extend([sample["Unanswerablity-Reason"] for sample in curr_data])
 
-        responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
-        responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
+        responses["Regular-Prompt"].extend(HF_request([sample['Regular-Prompt'] for sample in curr_data], **kwargs))
+        responses["Hint-Prompt"].extend(HF_request([sample['Hint-Prompt'] for sample in curr_data], **kwargs))
         responses["Ablation1"].extend(HF_request([sample['Ablation1'] for sample in curr_data], **kwargs))
         responses["Ablation2"].extend(HF_request([sample['Ablation2'] for sample in curr_data], **kwargs))
 
         # Chain-of-Thought prompts
         if args.CoT_prompt:
-            responses["Adversarial-CoT"].extend(HF_request([sample['Adversarial-CoT'] for sample in curr_data], **kwargs))
-            responses["Pseudo-Adversarial-CoT"].extend(HF_request([sample['Pseudo-Adversarial-CoT'] for sample in curr_data], **kwargs))
+            responses["Regular-Prompt-CoT"].extend(HF_request([sample['Regular-Prompt-CoT'] for sample in curr_data], **kwargs))
+            responses["Hint-Prompt-CoT"].extend(HF_request([sample['Hint-Prompt-CoT'] for sample in curr_data], **kwargs))
             responses["Ablation1-CoT"].extend(HF_request([sample['Ablation1-CoT'] for sample in curr_data], **kwargs))
             responses["Ablation2-CoT"].extend(HF_request([sample['Ablation2-CoT'] for sample in curr_data], **kwargs))
         else:
-            responses["Adversarial-CoT"].extend([""]*batch_size)
-            responses["Pseudo-Adversarial-CoT"].extend([""]*batch_size)
+            responses["Regular-Prompt-CoT"].extend([""]*batch_size)
+            responses["Hint-Prompt-CoT"].extend([""]*batch_size)
             responses["Ablation1-CoT"].extend([""]*batch_size)
             responses["Ablation2-CoT"].extend([""]*batch_size)            
 
@@ -80,8 +80,8 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, icl_variant
             responses["Answerability"].extend([""]*batch_size)
             responses["Answerability-CoT"].extend([""]*batch_size)
 
-        responses["Passage"].extend([squad_Passage(sample['Adversarial']) for sample in curr_data])
-        responses["Question"].extend([squad_Question(sample['Adversarial']) for sample in curr_data])
+        responses["Passage"].extend([squad_Passage(sample['Regular-Prompt']) for sample in curr_data])
+        responses["Question"].extend([squad_Question(sample['Regular-Prompt']) for sample in curr_data])
 
     return responses
 
@@ -96,8 +96,8 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, icl_variant, d
     batch_size = args.batch_size
 
     responses = {"ids":[], "annotation_ids":[], 
-                 "Adversarial":[], "Adversarial-CoT":[],
-                 "Pseudo-Adversarial":[], "Pseudo-Adversarial-CoT":[],
+                 "Regular-Prompt":[], "Regular-Prompt-CoT":[],
+                 "Hint-Prompt":[], "Hint-Prompt-CoT":[],
                  "Ablation1":[], "Ablation1-CoT":[],
                  "Ablation2":[], "Ablation2-CoT":[],
                  "Answerability":[], "Answerability-CoT":[],
@@ -118,20 +118,20 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, icl_variant, d
         responses["ids"].extend([sample["example_id"] for sample in curr_data])
         responses["annotation_ids"].extend([sample["annotation_id"] for sample in curr_data])
 
-        responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
-        responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
+        responses["Regular-Prompt"].extend(HF_request([sample['Regular-Prompt'] for sample in curr_data], **kwargs))
+        responses["Hint-Prompt"].extend(HF_request([sample['Hint-Prompt'] for sample in curr_data], **kwargs))
         responses["Ablation1"].extend(HF_request([sample['Ablation1'] for sample in curr_data], **kwargs))
         responses["Ablation2"].extend(HF_request([sample['Ablation2'] for sample in curr_data], **kwargs))
 
         # Chain-of-Thought prompts
         if args.CoT_prompt:
-            responses["Adversarial-CoT"].extend(HF_request([sample['Adversarial-CoT'] for sample in curr_data], **kwargs))
-            responses["Pseudo-Adversarial-CoT"].extend(HF_request([sample['Pseudo-Adversarial-CoT'] for sample in curr_data], **kwargs))
+            responses["Regular-Prompt-CoT"].extend(HF_request([sample['Regular-Prompt-CoT'] for sample in curr_data], **kwargs))
+            responses["Hint-Prompt-CoT"].extend(HF_request([sample['Hint-Prompt-CoT'] for sample in curr_data], **kwargs))
             responses["Ablation1-CoT"].extend(HF_request([sample['Ablation1-CoT'] for sample in curr_data], **kwargs))
             responses["Ablation2-CoT"].extend(HF_request([sample['Ablation2-CoT'] for sample in curr_data], **kwargs))
         else:
-            responses["Adversarial-CoT"].extend([""]*batch_size)
-            responses["Pseudo-Adversarial-CoT"].extend([""]*batch_size)
+            responses["Regular-Prompt-CoT"].extend([""]*batch_size)
+            responses["Hint-Prompt-CoT"].extend([""]*batch_size)
             responses["Ablation1-CoT"].extend([""]*batch_size)
             responses["Ablation2-CoT"].extend([""]*batch_size)
 
@@ -147,8 +147,8 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, icl_variant, d
             responses["Answerability"].extend([""]*batch_size)
             responses["Answerability-CoT"].extend([""]*batch_size)
 
-        responses["Passage"].extend([NQ_Passage(sample['Adversarial']) for sample in curr_data])
-        responses["Question"].extend([NQ_Question(sample['Adversarial']) for sample in curr_data])
+        responses["Passage"].extend([NQ_Passage(sample['Regular-Prompt']) for sample in curr_data])
+        responses["Question"].extend([NQ_Question(sample['Regular-Prompt']) for sample in curr_data])
 
     return responses
 
@@ -163,8 +163,8 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, icl_varia
     batch_size = args.batch_size
 
     responses = {"ids":[], 
-                 "Adversarial":[], "Adversarial-CoT":[],
-                 "Pseudo-Adversarial":[], "Pseudo-Adversarial-CoT":[],
+                 "Regular-Prompt":[], "Regular-Prompt-CoT":[],
+                 "Hint-Prompt":[], "Hint-Prompt-CoT":[],
                  "Ablation1":[], "Ablation1-CoT":[],
                  "Ablation2":[], "Ablation2-CoT":[],
                  "Answerability":[], "Answerability-CoT":[],
@@ -183,20 +183,20 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, icl_varia
         curr_data = data[batch_i*batch_size:(batch_i+1)*batch_size]
         responses["ids"].extend([sample["id"] for sample in curr_data])
 
-        responses["Adversarial"].extend(HF_request([sample['Adversarial'] for sample in curr_data], **kwargs))
-        responses["Pseudo-Adversarial"].extend(HF_request([sample['Pseudo-Adversarial'] for sample in curr_data], **kwargs))
+        responses["Regular-Prompt"].extend(HF_request([sample['Regular-Prompt'] for sample in curr_data], **kwargs))
+        responses["Hint-Prompt"].extend(HF_request([sample['Hint-Prompt'] for sample in curr_data], **kwargs))
         responses["Ablation1"].extend(HF_request([sample['Ablation1'] for sample in curr_data], **kwargs))
         responses["Ablation2"].extend(HF_request([sample['Ablation2'] for sample in curr_data], **kwargs))
 
         # Chain-of-Thought prompts
         if args.CoT_prompt:
-            responses["Adversarial-CoT"].extend(HF_request([sample['Adversarial-CoT'] for sample in curr_data], **kwargs))
-            responses["Pseudo-Adversarial-CoT"].extend(HF_request([sample['Pseudo-Adversarial-CoT'] for sample in curr_data], **kwargs))
+            responses["Regular-Prompt-CoT"].extend(HF_request([sample['Regular-Prompt-CoT'] for sample in curr_data], **kwargs))
+            responses["Hint-Prompt-CoT"].extend(HF_request([sample['Hint-Prompt-CoT'] for sample in curr_data], **kwargs))
             responses["Ablation1-CoT"].extend(HF_request([sample['Ablation1-CoT'] for sample in curr_data], **kwargs))
             responses["Ablation2-CoT"].extend(HF_request([sample['Ablation2-CoT'] for sample in curr_data], **kwargs))
         else:
-            responses["Adversarial-CoT"].extend([""]*batch_size)
-            responses["Pseudo-Adversarial-CoT"].extend([""]*batch_size)
+            responses["Regular-Prompt-CoT"].extend([""]*batch_size)
+            responses["Hint-Prompt-CoT"].extend([""]*batch_size)
             responses["Ablation1-CoT"].extend([""]*batch_size)
             responses["Ablation2-CoT"].extend([""]*batch_size)
 
@@ -212,8 +212,8 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, icl_varia
             responses["Answerability"].extend([""]*batch_size)
             responses["Answerability-CoT"].extend([""]*batch_size)
 
-        responses["Context"].extend([musique_Context(sample['Adversarial']) for sample in curr_data])
-        responses["Question"].extend([musique_Question(sample['Adversarial']) for sample in curr_data])
+        responses["Context"].extend([musique_Context(sample['Regular-Prompt']) for sample in curr_data])
+        responses["Question"].extend([musique_Question(sample['Regular-Prompt']) for sample in curr_data])
 
     return responses
 

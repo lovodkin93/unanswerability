@@ -141,7 +141,7 @@ if __name__ == '__main__':
     argparser.add_argument('--classifier-dir', type=str, required=True, help='path to classifier')
     argparser.add_argument('--outdir', type=str, default=None, help='outdir to save results')
     argparser.add_argument('--dataset', type=str, default=None, help='prompt type to classify ("squad", "NQ", "musique")')
-    argparser.add_argument('--prompt-type', type=str, default="Adversarial", help='prompt type to classify ("Adversarial", "Pseudo-Adversarial", "CoT-Adversarial", "Answerability")')
+    argparser.add_argument('--prompt-type', type=str, default="Regular-Prompt", help='prompt type to classify ("Regular-Prompt", "Hint-Prompt", "CoT-Prompt", "Answerability")')
     argparser.add_argument('--aggregation-type', type=str, default="only_first_tkn", help='how to aggregate all the hidden layers of all the generated tokens of a single instance (choose from "average" to average them, "union" to treat each of them as an instance, and "only_first_tkn" to only take the first token\'s hidden layers).')
     argparser.add_argument('--embedding-type', type=str, default="last_hidden_embedding", help='which layer to take: any one of "last_hidden_embedding" and "first_hidden_embedding"')
     args = argparser.parse_args()
