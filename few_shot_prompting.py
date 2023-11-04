@@ -337,7 +337,7 @@ def main(args):
                         print(f"model: {model['output_subdir']} data: {dataset['data_name']} type: {dataset['type']} variant: {p_variant} icl_examples_variant: {icl_variant} k_beams: {k_beams}")
                         
                         # create directory
-                        curr_outdir = os.path.join(outdir_path, model['output_subdir'], "few_shot_with_instructions", f"k_beams_{k_beams}", p_variant, f"icl_examples_v{icl_variant}")
+                        curr_outdir = os.path.join(outdir_path, model['output_subdir'], "few_shot", f"k_beams_{k_beams}", p_variant, f"icl_examples_v{icl_variant}")
                         path = Path(curr_outdir)
                         path.mkdir(parents=True, exist_ok=True)
                         curr_outdir = os.path.join(curr_outdir, f"{dataset['type']}_{dataset['data_name']}.pt")

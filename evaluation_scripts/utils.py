@@ -71,7 +71,7 @@ def get_icl_variant(indir):
         raise Exception(f"icl_examples found in indir, but no known version was found: {indir}")
 
 def get_evalulation_outdir(subdir, curr_dataset, outdir_path):
-    zero_or_few = "zero_shot" if "zero_shot" in subdir else "few_shot_with_instructions"
+    zero_or_few = "zero_shot" if "zero_shot" in subdir else "few_shot"
     model_name = get_model_name(subdir)
     variant = get_variant(subdir)
     num_beams = get_num_beams(subdir)
