@@ -57,7 +57,7 @@ In addition to the actual generated outputs saved in the "regular_decoding" sub-
 ### Evaluation
 To evaluate the generated texts, run:
 ```
-python -m evaluation_scripts.evaluate --indirs <INDIRS> --outdir /path/to/outdir 
+python -m evaluation.evaluate --indirs <INDIRS> --outdir /path/to/outdir 
 ```
 
 Where `<INDIRS>` should be all the `outdirs` passed to either one of `zero_shot_prompting.py` or `few_shot_prompting.py` (separated by a single space). This will save under `/path/to/outdir` a csv file `QA-task-results.csv` with the results on the QA task for each of the prompt types (e.g., `Regular-Prompt` or `Hint-Prompt`), and an excel file `unanswerability_classification_results.xlsx`, with the unanswerability classification results for each of the prompt types. 
@@ -103,7 +103,7 @@ This will save under `outdir/<DATASET>/<EMBEDDING_TYPE>/<PROMPT_TYPE>/only_first
 #### Evaluate
 To evaluate the answerability linear classifiers, run:
 ```
-python evaluation_scripts/eval_linear_classifiers.py --indir <DATA_INDIR> --classifier-dir <CLASSIFIER_INDIR> --dataset <DATASET> --prompt-type <PROMPT_TYPE> --embedding-type <EMBEDDING_TYPE>
+python evaluation/eval_linear_classifiers.py --indir <DATA_INDIR> --classifier-dir <CLASSIFIER_INDIR> --dataset <DATASET> --prompt-type <PROMPT_TYPE> --embedding-type <EMBEDDING_TYPE>
 ```
 
 where `<DATA_INDIR>` is the path to the directory with the pt files of <ins>the test set</ins>, `<CLASSIFIER_INDIR>` is the path to the trained linear classifier, `<DATASET>` should be replaced by either one of `squad`, `NQ`, `musique` and should represent the dataset of the test set, `<PROMPT_TYPE>` should be either `Regular-Prompt` or `Hint-Prompt` and `<EMBEDDING_TYPE>` should be either `first_hidden_embedding` or `last_hidden_embedding`.

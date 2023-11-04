@@ -13,13 +13,13 @@ def main(args):
     print(f"results are saved under {outdir}")
     print("Calculating performance in unanswerability classification ...")
     # run unanswerability classification
-    eval_script = os.path.join("evaluation_scripts", "evaluate-unanswerability-classification.py")
+    eval_script = os.path.join("evaluation", "evaluate-unanswerability-classification.py")
     script_args = ["--indirs"] + args.indirs + ["--outdir"] + [outdir]
     subprocess.run(['python', eval_script] + script_args)
 
     # run QA task evaluation
     print("Calculating performance on the QA task ...")
-    eval_script = os.path.join("evaluation_scripts", "evaluate-QA-task.py")
+    eval_script = os.path.join("evaluation", "evaluate-QA-task.py")
     script_args = ["--indirs"] + args.indirs + ["--outdir"] + [outdir]
     if args.devset:
         script_args += ["--devset"]

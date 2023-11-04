@@ -40,7 +40,7 @@ def main(args):
                 ###### run the relevant evaluation script ######
                 # get the script
                 eval_script = "evaluate-squad-v2.0.py" if curr_dataset == "squad" else "evaluate-NQ-musique.py"
-                eval_script = os.path.join("evaluation_scripts", eval_script)
+                eval_script = os.path.join("evaluation", eval_script)
 
                 # get path to gold data
                 gold_outputs_suffix = "json" if curr_dataset == "squad" else "jsonl"
