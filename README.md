@@ -31,6 +31,7 @@ python zero_shot_embeddings.py --models <MODELS> --datasets <DATASETS> --return-
 where `<MODELS>` should be replaced by either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML` (or their concatenation - for running on several models), and `<DATASETS>` should be replaced by either one of `squad`, `NQ`, `musique` (or their concatenation - for running on several datasets).
 
 This should save in the outdir folder two pt files - one starting with `un-answerable` and one starting with `answerable`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
+It would also save the actual generated outputs in a sub-directory named "regular_decoding".
 
 Additionally, to run this script on the develpment set, also pass the `--devset` flag.
 
@@ -50,6 +51,7 @@ Lastly, you can choose one of the in-context-learning examples variants by passi
 ### Beam Relaxation
 To run the beam relaxation experiments, simply run the zero-shot experiment with the additional `--k-beams <BEAM_SIZE>` parameter.
 
+In addition to the actual generated outputs saved in the "regular_decoding" sub-directory, the beam-relaxation version would be saved under the sub-directory "beam-relaxation".
 
 
 ### Evaluation
