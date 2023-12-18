@@ -1,3 +1,7 @@
+# <h2 align="center"> The Curious Case of Hallucinatory (Un)answerability: Finding Truths in the Hidden States of Over-Confident Large Language Models </h2>
+
+Repository for our EMNLP 2023 paper "[The Curious Case of Hallucinatory (Un)answerability: Finding Truths in the Hidden States of Over-Confident Large Language Models](https://aclanthology.org/2023.emnlp-main.220/)"
+
 # Unanswerability
 Begin by setting the `MAX_GPU_MEM` and `MAX_CPU_MEM` parameters in `constants.py` to the maximum GPU and CPU (respectively) memory capacity of the machine you work on.
 
