@@ -125,7 +125,7 @@ conda env create -f subspace_erasure.yml
 conda activate subspace_erasure
 ```
 
-Before starting these experiments, please make sure you have the embeddings of the **train set** instances mentioned at the beginning of the **Probing Experiments** section.
+Before starting these experiments, please make sure you have the embeddings of the **train set** instances mentioned at the beginning of the [Probing Experiments](#probing-experiments) section.
 Once you have the embeddings of the **train set** instances, we will start by training the concept eraser, by running:
 
 ```
