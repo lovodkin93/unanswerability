@@ -71,9 +71,9 @@ python -m evaluation.evaluate --indirs <INDIRS> --outdir /path/to/outdir
 * For results on development set, add `--devset`.
 
 # Probing Experiments
-## Preliminaries
+## Preliminaries - Get Embeddings
 1. **Generate Embeddings**: Run the [Zero-shot Prompting](#zero-shot-prompting) experiments without the `--return-only-generated-text` parameter.
-  * This will also save the generations' embeddings (last hidden layer of first generated token) of <ins>the test set</ins>.. 
+    * This will also save the generations' embeddings (last hidden layer of first generated token) of <ins>the test set</ins>. 
 2. **Generate Train Set Embeddings**: In addition to step 1, also add `--trainset`.
 * to run steps 1 and 2 on the <ins>first</ins> hidden layer of the first generated token, add `--return-first-layer`.
 * Prompt variant can be changed like in [Zero-shot Prompting](#zero-shot-prompting).
@@ -89,8 +89,8 @@ python train_linear_classifiers.py --indir <INDIR> --outdir /path/to/outdir --da
 * `<DATASET>` - either one of `squad`, `NQ`, `musique`.
 * `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
 * To train a classifier on the <ins>first</ins> hidden layer of the first generated token, add `--embedding-type first_hidden_embedding`.
-* **output** - save under `outdir/<DATASET>/<EMBEDDING_TYPE>/<PROMPT_TYPE>/only_first_tkn/<MODEL_NAME>_1000N"` the trained classifier
-  * `<EMBEDDING_TYPE>` - `first_hidden_embedding` or `last_hidden_embedding`
+* **output** - save under `outdir/<DATASET>/<EMBEDDING_TYPE>/<PROMPT_TYPE>/only_first_tkn/<MODEL_NAME>_1000N"` the trained classifier.
+  * `<EMBEDDING_TYPE>` - `first_hidden_embedding` or `last_hidden_embedding`.
   * `<MODEL_NAME>` - name of the model whose embeddings were used to train the classifier.
 
 ### Evaluate Answerability Linear Classifiers
@@ -99,26 +99,32 @@ Run:
 python evaluation/eval_linear_classifiers.py --indir <DATA_INDIR> --classifier-dir <CLASSIFIER_INDIR> --dataset <DATASET> --prompt-type <PROMPT_TYPE> --embedding-type <EMBEDDING_TYPE>
 ```
 
-where `<DATA_INDIR>` is the path to the directory with the pt files of <ins>the test set</ins>, `<CLASSIFIER_INDIR>` is the path to the trained linear classifier, `<DATASET>` should be replaced by either one of `squad`, `NQ`, `musique` and should represent the dataset of the test set, `<PROMPT_TYPE>` should be either `Regular-Prompt` or `Hint-Prompt` and `<EMBEDDING_TYPE>` should be either `first_hidden_embedding` or `last_hidden_embedding`.
+* `<DATA_INDIR>` - path to directory with the <ins>the test set</ins> pt files.
+* `<CLASSIFIER_INDIR>` - path to the trained linear classifier.
+* `<DATASET>` - any one of `squad`, `NQ`, `musique` (should represent the dataset of the test set).
+* `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
+*  `<EMBEDDING_TYPE>` - `first_hidden_embedding` or `last_hidden_embedding`.
 
 ### Visualize Embedding Space
-To visualize the embedding space, run:
+Run:
 
 ```
 python figures_generation/PCA_plots_generation.py -i /path/to/folder/with/pt_files -o /path/to/outdir --prompt-type <PROMPT_TYPE> 
 ```
 
-where `<PROMPT_TYPE>` should be either `Regular-Prompt` or `Hint-Prompt`. The generated 3-D PCA plots of the embedding space will be saved under `/path/to/outdir/last_hidden_embedding/only_first_tkn/<PROMPT_TYPE>`.
+* `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
+* **output** - The generated 3-D PCA plots of the embedding space will be saved under `/path/to/outdir/last_hidden_embedding/only_first_tkn/<PROMPT_TYPE>`.
 
 # Answerability Subspace Erasure
-To perform this experiment, we first need to create a separate conda env. For that, set the `prefix` variable in `subspace_erasure.yml` to your `path/to/anaconda3/envs/subspace_erasure` location, and then run:
-
+## Preliminaries
+1. **Create a Conda Environment**:
+   * Adjust `prefix` in `subspace_erasure.yml` to your Anaconda environment path.
+   * Run these commands:
 ```
 conda env create -f subspace_erasure.yml
 conda activate subspace_erasure
 ```
-
-Before starting these experiments, please make sure you have the embeddings of the **train set** instances mentioned at the beginning of the [Probing Experiments](#probing-experiments) section.
+2. Make sure you have the embeddings of the **train set** from [Preliminaries - Get Embeddings](#preliminaries-get-embeddings).
 Once you have the embeddings of the **train set** instances, we will start by training the concept eraser, by running:
 
 ```
