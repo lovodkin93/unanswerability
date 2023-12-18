@@ -38,8 +38,8 @@ python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-o
 * For prompt variants, also pass `--prompt-variant <VARIANT_LIST>`, where `<VARIANT_LIST>` could be any one of `variant1`, `variant2`, `variant3` (can pass more than one).
 * For development set experiments, add `--devset`.
 
-- This should save in the outdir folder two pt files - one starting with `un-answerable` and one starting with `answerable`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
-- It would also save the actual generated outputs in a sub-directory named "regular_decoding".
+ - This should save in the outdir folder two pt files - one starting with `un-answerable` and one starting with `answerable`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
+ - It would also save the actual generated outputs in a sub-directory named "regular_decoding".
 
 
 
