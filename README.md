@@ -36,7 +36,7 @@ python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-o
 * `<MODELS>` - any one of `Flan-UL2`, `Flan-T5-xxl`, or `OPT-IML`(can pass more than one).
 * `<DATASETS>` - any one of `squad`, `NQ`, or `musique` (can pass more than one).
 * For prompt variants, add `--prompt-variant <VARIANT_LIST>`:
-  - `<VARIANT_LIST>` - either one of `variant1`, `variant2`, `variant3` (can pass more than one).
+  - `<VARIANT_LIST>` - any one of `variant1`, `variant2`, `variant3` (can pass more than one).
     - Default - `variant1`.
 * For development set experiments, add `--devset`.
 * **Output**: Saves two `.pt` files in the specified outdir, one for answerable and one for un-answerable prompts.
@@ -51,7 +51,7 @@ python few_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-on
 * `<MODELS>` and `<DATASETS>` are similar to those in [Zero-shot Prompting](#zero-shot-prompting).
 * Prompt variant can be changed like in [Zero-shot Prompting](#zero-shot-prompting).
 * For in-context-learning examples variants - add `--icl-examples-variant <ICL_VARIANT_LIST>`:
-  * `<ICL_VARIANT_LIST>` - either one of `1`, `2`, `3` (can pass more than one). 
+  * `<ICL_VARIANT_LIST>` - any one of `1`, `2`, `3` (can pass more than one). 
 
 ## Beam Relaxation
 For beam relaxation experiments, just add `--k-beams <BEAM_SIZE>` to the [Zero-shot Prompting](#zero-shot-prompting) command.
@@ -86,7 +86,7 @@ Run:
 python train_linear_classifiers.py --indir <INDIR> --outdir /path/to/outdir --dataset <DATASET> --prompt-type <PROMPT_TYPE> --epochs 100 --batch-size 16 --num-instances 1000
 ```
 * `<INDIR>` - path to the directory with the pt files of <ins>the train set</ins>.
-* `<DATASET>` - either one of `squad`, `NQ`, `musique`.
+* `<DATASET>` - any one of `squad`, `NQ`, `musique`.
 * `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
 * To train a classifier on the <ins>first</ins> hidden layer of the first generated token, add `--embedding-type first_hidden_embedding`.
 * **output** - save under `outdir/<DATASET>/<EMBEDDING_TYPE>/<PROMPT_TYPE>/only_first_tkn/<MODEL_NAME>_1000N"` the trained classifier.
