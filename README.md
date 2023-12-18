@@ -124,7 +124,7 @@ python figures_generation/PCA_plots_generation.py -i /path/to/folder/with/pt_fil
 conda env create -f subspace_erasure.yml
 conda activate subspace_erasure
 ```
-2. Make sure you have the embeddings of the **train set** from [Preliminaries - Get Embeddings](#preliminaries-get-embeddings).
+2. Make sure you have the embeddings of the **train set** from [Preliminaries - Get Embeddings](#preliminaries---get-embeddings).
 Once you have the embeddings of the **train set** instances, we will start by training the concept eraser, by running:
 
 ```
