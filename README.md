@@ -66,8 +66,8 @@ python -m evaluation.evaluate --indirs <INDIRS> --outdir /path/to/outdir
 ```
 * `<INDIRS>`: output directories from the prompting experiments.
 * **output**: save under `outdir`:
-  -  `QA-task-results.csv` - results on the QA task for each prompt type (e.g., `Regular-Prompt` or `Hint-Prompt`).
-  -  `unanswerability_classification_results.xlsx` - unanswerability classification results for each prompt type.
+  -  <ins>QA-task-results.csv</ins> - results on the QA task for each prompt type (e.g., `Regular-Prompt` or `Hint-Prompt`).
+  -  <ins>unanswerability_classification_results.xlsx</ins> - unanswerability classification results for each prompt type.
 * For results on development set, add `--devset`.
 
 # Probing Experiments
