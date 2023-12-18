@@ -71,43 +71,30 @@ python -m evaluation.evaluate --indirs <INDIRS> --outdir /path/to/outdir
 * For results on development set, add `--devset`.
 
 # Probing Experiments
-To run the probing experiments, you first need to run the aforementioned zero-shot experiments **without** the `--return-only-generated-text` parameter, which will also save the embeddings of the generations. In other words, run:
+## Preliminaries
+1. **Generate Embeddings**: Run the [Zero-shot Prompting](#zero-shot-prompting) experiments without the `--return-only-generated-text` parameter.
+  * This will also save the generations' embeddings (last hidden layer of first generated token) of <ins>the test set</ins>.. 
+2. **Generate Train Set Embeddings**: In addition to step 1, also add `--trainset`.
+* to run steps 1 and 2 on the <ins>first</ins> hidden layer of the first generated token, add `--return-first-layer`.
+* Prompt variant can be changed like in [Zero-shot Prompting](#zero-shot-prompting).
 
-```
-python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --outdir /path/to/outdir
-```
+### Train Answerability Linear Classifiers
 
-This will save the embeddings of the <ins>last</ins> hidden layer of the first generated token for each instance of <ins>the test set</ins>.
-
-Additionally, to train the linear classifiers, we also need to extract the embeddings of the **train set**. For that, we need to also pass `--trainset`:
-```
-python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --outdir /path/to/outdir --trainset
-```
-This will also save the embeddings of the <ins>last</ins> hidden layer of the first generated token for each instance, but for <ins>the train set</ins>.
-
-To also save the <ins>first</ins> hidden layer of the first generated token, pass also `--return-first-layer`.
-
-As before, we can also pass `--prompt-variant <VARIANT_LIST>` to control which (hint) prompt variant to use.
-
-
-## Linear Classifiers
-
-### Train
-
-To train the answerability linear classifiers, run:
+Run:
 
 ```
 python train_linear_classifiers.py --indir <INDIR> --outdir /path/to/outdir --dataset <DATASET> --prompt-type <PROMPT_TYPE> --epochs 100 --batch-size 16 --num-instances 1000
 ```
+* `<INDIR>` - path to the directory with the pt files of <ins>the train set</ins>.
+* `<DATASET>` - either one of `squad`, `NQ`, `musique`.
+* `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
+* To train a classifier on the <ins>first</ins> hidden layer of the first generated token, add `--embedding-type first_hidden_embedding`.
+* **output** - save under `outdir/<DATASET>/<EMBEDDING_TYPE>/<PROMPT_TYPE>/only_first_tkn/<MODEL_NAME>_1000N"` the trained classifier
+  * `<EMBEDDING_TYPE>` - `first_hidden_embedding` or `last_hidden_embedding`
+  * `<MODEL_NAME>` - name of the model whose embeddings were used to train the classifier.
 
-where `<INDIR>` is the path to the directory with the pt files of <ins>the train set</ins>, `<DATASET>` should be replaced by either one of `squad`, `NQ`, `musique` and `<PROMPT_TYPE>` should be either `Regular-Prompt` or `Hint-Prompt`.
-
-Additionally, to train a classifier on the <ins>first</ins> hidden layer of the first generated token, also pass `--embedding-type first_hidden_embedding`.
-
-This will save under `outdir/<DATASET>/<EMBEDDING_TYPE>/<PROMPT_TYPE>/only_first_tkn/<MODEL_NAME>_1000N"` the trained classifier (where `<EMBEDDING_TYPE>` is either `first_hidden_embedding` or `last_hidden_embedding` and `<MODEL_NAME>` is the name of the model whose embeddings were used to train the classifier).
-
-### Evaluate
-To evaluate the answerability linear classifiers, run:
+### Evaluate Answerability Linear Classifiers
+Run:
 ```
 python evaluation/eval_linear_classifiers.py --indir <DATA_INDIR> --classifier-dir <CLASSIFIER_INDIR> --dataset <DATASET> --prompt-type <PROMPT_TYPE> --embedding-type <EMBEDDING_TYPE>
 ```
