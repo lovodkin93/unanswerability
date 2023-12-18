@@ -146,6 +146,6 @@ where `<MODELS>` should be replaced by either one of `Flan-UL2`, `Flan-T5-xxl`, 
 
 This should save in the outdir folder two pt files - one starting with `un-answerable` and one starting with `answerable`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
 
-Now, to evaluate the responses, follow the the instructions under the **Evaluation** sub-section of the **Prompt Manipulations and Beam Relaxation Experiments** [Evaluation](###-evaluation) section. 
+Now, to evaluate the responses, follow the the instructions under the **Evaluation** sub-section of the **Prompt Manipulations and Beam Relaxation Experiments** [Evaluation](#-evaluation) section. 
 
 Additionally, to visualize the embeddings, follow the **Visualize Embedding Space** instructions under the **Linear Classifiers** sub-section.
