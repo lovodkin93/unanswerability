@@ -2,7 +2,7 @@
 
 Repository for our EMNLP 2023 paper "[The Curious Case of Hallucinatory (Un)answerability: Finding Truths in the Hidden States of Over-Confident Large Language Models](https://aclanthology.org/2023.emnlp-main.220/)"
 
-# Unanswerability
+## Preliminaries
 Begin by setting the `MAX_GPU_MEM` and `MAX_CPU_MEM` parameters in `constants.py` to the maximum GPU and CPU (respectively) memory capacity of the machine you work on.
 
 Additionally, create the conda env of the project by setting the `prefix` variable in `unanswerability_env.yml` to your `path/to/anaconda3/envs/unanswerability_env` location, and then run:
@@ -153,3 +153,30 @@ This should save in the outdir folder two pt files - one starting with `un-answe
 To evaluate the responses, follow the instructions under [Evaluation](#evaluation). 
 
 Additionally, to visualize the embeddings, follow the instructions under [Visualize Embedding Space](#visualize-embedding-space).
+
+# Citation
+
+If you use this in your work, please cite:
+
+```
+@inproceedings{slobodkin-etal-2023-curious,
+    title = "The Curious Case of Hallucinatory (Un)answerability: Finding Truths in the Hidden States of Over-Confident Large Language Models",
+    author = "Slobodkin, Aviv  and
+      Goldman, Omer  and
+      Caciularu, Avi  and
+      Dagan, Ido  and
+      Ravfogel, Shauli",
+    editor = "Bouamor, Houda  and
+      Pino, Juan  and
+      Bali, Kalika",
+    booktitle = "Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing",
+    month = dec,
+    year = "2023",
+    address = "Singapore",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2023.emnlp-main.220",
+    doi = "10.18653/v1/2023.emnlp-main.220",
+    pages = "3607--3625",
+    abstract = "Large language models (LLMs) have been shown to possess impressive capabilities, while also raising crucial concerns about the faithfulness of their responses. A primary issue arising in this context is the management of (un)answerable queries by LLMs, which often results in hallucinatory behavior due to overconfidence. In this paper, we explore the behavior of LLMs when presented with (un)answerable queries. We ask: do models \textit{represent} the fact that the question is (un)answerable when generating a hallucinatory answer? Our results show strong indications that such models encode the answerability of an input query, with the representation of the first decoded token often being a strong indicator. These findings shed new light on the spatial organization within the latent representations of LLMs, unveiling previously unexplored facets of these models. Moreover, they pave the way for the development of improved decoding techniques with better adherence to factual generation, particularly in scenarios where query (un)answerability is a concern.",
+}
+```
