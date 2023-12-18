@@ -2,7 +2,7 @@
 
 Repository for our EMNLP 2023 paper "[The Curious Case of Hallucinatory (Un)answerability: Finding Truths in the Hidden States of Over-Confident Large Language Models](https://aclanthology.org/2023.emnlp-main.220/)"
 
-## Preliminaries
+# Preliminaries
 Begin by setting the `MAX_GPU_MEM` and `MAX_CPU_MEM` parameters in `constants.py` to the maximum GPU and CPU (respectively) memory capacity of the machine you work on.
 
 Additionally, create the conda env of the project by setting the `prefix` variable in `unanswerability_env.yml` to your `path/to/anaconda3/envs/unanswerability_env` location, and then run:
@@ -12,7 +12,7 @@ conda env create -f unanswerability_env.yml
 python -m spacy download en_core_web_sm
 conda activate unanswerability_env
 ```
-## Download Dataset
+# Download Dataset
 To download the dataset, run:
 ```
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1E3wZLRUi4JZ2ebD0rSKHTq8ISnecOj6_' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1E3wZLRUi4JZ2ebD0rSKHTq8ISnecOj6_" -O data.zip && rm -rf /tmp/cookies.txt
@@ -25,9 +25,9 @@ and then uzip it:
 unzip data.zip
 ```
 
-## Prompt Manipulations and Beam Relaxation Experiments
+# Prompt Manipulations and Beam Relaxation Experiments
 
-### zero-shot Prompting
+## zero-shot Prompting
 To run the zero-shot prompt-manipulation experiment, run the following code:
 ```
 python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-only-generated-text --outdir /path/to/outdir
@@ -41,7 +41,7 @@ Additionally, to run this script on the develpment set, also pass the `--devset`
 
 Also, to run on different prompt variants (affects only cases where there is a hint of the un-answerability) - pass `--prompt-variant <VARIANT_LIST>` where `<VARIANT_LIST>` could be any concatenation of `variant1`, `variant2`, `variant3` (default is only `variant1`).
 
-### Few-shot Prompting
+## Few-shot Prompting
 To run the few-shot prompt-manipulation experiment, run the following code:
 ```
 python few_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-only-generated-text --outdir /path/to/outdir
@@ -52,13 +52,13 @@ As for the zero-shot case, you can also change the prompt variant by passing `--
 
 Lastly, you can choose one of the in-context-learning examples variants by passing `--icl-examples-variant <ICL_VARIANT_LIST>` where `<ICL_VARIANT_LIST>` could be any concatenation of `1`, `2`, `3` (default is only `1`).
 
-### Beam Relaxation
+## Beam Relaxation
 To run the beam relaxation experiments, simply run the zero-shot experiment with the additional `--k-beams <BEAM_SIZE>` parameter.
 
 In addition to the actual generated outputs saved in the "regular_decoding" sub-directory, the beam-relaxation version would be saved under the sub-directory "beam-relaxation".
 
 
-### Evaluation
+## Evaluation
 To evaluate the generated texts, run:
 ```
 python -m evaluation.evaluate --indirs <INDIRS> --outdir /path/to/outdir 
@@ -68,7 +68,7 @@ Where `<INDIRS>` should be all the `outdirs` passed to either one of `zero_shot_
 
 Additionally, to get the results on the development set, add the parameter `--devset`.
 
-## Probing Experiments
+# Probing Experiments
 To run the probing experiments, you first need to run the aforementioned zero-shot experiments **without** the `--return-only-generated-text` parameter, which will also save the embeddings of the generations. In other words, run:
 
 ```
@@ -88,9 +88,9 @@ To also save the <ins>first</ins> hidden layer of the first generated token, pas
 As before, we can also pass `--prompt-variant <VARIANT_LIST>` to control which (hint) prompt variant to use.
 
 
-### Linear Classifiers
+## Linear Classifiers
 
-#### Train
+### Train
 
 To train the answerability linear classifiers, run:
 
@@ -104,7 +104,7 @@ Additionally, to train a classifier on the <ins>first</ins> hidden layer of the 
 
 This will save under `outdir/<DATASET>/<EMBEDDING_TYPE>/<PROMPT_TYPE>/only_first_tkn/<MODEL_NAME>_1000N"` the trained classifier (where `<EMBEDDING_TYPE>` is either `first_hidden_embedding` or `last_hidden_embedding` and `<MODEL_NAME>` is the name of the model whose embeddings were used to train the classifier).
 
-#### Evaluate
+### Evaluate
 To evaluate the answerability linear classifiers, run:
 ```
 python evaluation/eval_linear_classifiers.py --indir <DATA_INDIR> --classifier-dir <CLASSIFIER_INDIR> --dataset <DATASET> --prompt-type <PROMPT_TYPE> --embedding-type <EMBEDDING_TYPE>
@@ -112,7 +112,7 @@ python evaluation/eval_linear_classifiers.py --indir <DATA_INDIR> --classifier-d
 
 where `<DATA_INDIR>` is the path to the directory with the pt files of <ins>the test set</ins>, `<CLASSIFIER_INDIR>` is the path to the trained linear classifier, `<DATASET>` should be replaced by either one of `squad`, `NQ`, `musique` and should represent the dataset of the test set, `<PROMPT_TYPE>` should be either `Regular-Prompt` or `Hint-Prompt` and `<EMBEDDING_TYPE>` should be either `first_hidden_embedding` or `last_hidden_embedding`.
 
-#### Visualize Embedding Space
+### Visualize Embedding Space
 To visualize the embedding space, run:
 
 ```
@@ -121,7 +121,7 @@ python figures_generation/PCA_plots_generation.py -i /path/to/folder/with/pt_fil
 
 where `<PROMPT_TYPE>` should be either `Regular-Prompt` or `Hint-Prompt`. The generated 3-D PCA plots of the embedding space will be saved under `/path/to/outdir/last_hidden_embedding/only_first_tkn/<PROMPT_TYPE>`.
 
-### Answerability Subspace Erasure
+# Answerability Subspace Erasure
 To perform this experiment, we first need to create a separate conda env. For that, set the `prefix` variable in `subspace_erasure.yml` to your `path/to/anaconda3/envs/subspace_erasure` location, and then run:
 
 ```
