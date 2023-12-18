@@ -72,7 +72,7 @@ python -m evaluation.evaluate --indirs <INDIRS> --outdir /path/to/outdir
 
 # Probing Experiments
 ## Preliminaries - Get Embeddings
-1. **Generate Embeddings**: Run the [Zero-shot Prompting](#zero-shot-prompting) experiments without the `--return-only-generated-text` parameter.
+1. **Generate Test Set Embeddings**: Run the [Zero-shot Prompting](#zero-shot-prompting) experiments without the `--return-only-generated-text` parameter.
     * This will also save the generations' embeddings (last hidden layer of first generated token) of <ins>the test set</ins>. 
 2. **Generate Train Set Embeddings**: In addition to step 1, also add `--trainset`.
 * to run steps 1 and 2 on the <ins>first</ins> hidden layer of the first generated token, add `--return-first-layer`.
