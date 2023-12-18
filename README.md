@@ -33,8 +33,8 @@ To perform the zero-shot prompt-manipulation experiment, run:
 ```
 python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-only-generated-text --outdir /path/to/outdir
 ```
-* `<MODELS>` - either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML`(can pass more than one).
-* `<DATASETS>` - either one of `squad`, `NQ`, `musique` (can pass more than one).
+* `<MODELS>` - any one of `Flan-UL2`, `Flan-T5-xxl`, or `OPT-IML`(can pass more than one).
+* `<DATASETS>` - any one of `squad`, `NQ`, or `musique` (can pass more than one).
 * For prompt variants, add `--prompt-variant <VARIANT_LIST>`:
   - `<VARIANT_LIST>` - either one of `variant1`, `variant2`, `variant3` (can pass more than one).
     - Default - `variant1`.
@@ -117,7 +117,7 @@ python figures_generation/PCA_plots_generation.py -i /path/to/folder/with/pt_fil
 
 # Answerability Subspace Erasure
 ## Preliminaries
-1. **Create a Conda Environment**:
+1. **Set Up Environment** - Create a separate Conda environment for this experiment:
    * Adjust `prefix` in `subspace_erasure.yml` to your Anaconda environment path.
    * Run these commands:
 ```
@@ -125,29 +125,29 @@ conda env create -f subspace_erasure.yml
 conda activate subspace_erasure
 ```
 2. Make sure you have the embeddings of the **train set** from [Preliminaries - Get Embeddings](#preliminaries---get-embeddings).
-Once you have the embeddings of the **train set** instances, we will start by training the concept eraser, by running:
+
+## Train Concept Eraser
+Run:
 
 ```
 python train_concept_eraser.py --indir <INDIR> --outdir /path/to/outdir --dataset <DATASET> --prompt-type <PROMPT_TYPE> --epochs 500 --batch-size 16 --num-instances 1000
 ```
 
-where `<INDIR>` is the path to the directory with the pt files of <ins>the train set</ins>, `<DATASET>` should be replaced by either one of `squad`, `NQ`, `musique` and `<PROMPT_TYPE>` should be either `Regular-Prompt` or `Hint-Prompt`.
+* `<INDIR>` - path to the directory with the embeddings (pt files) of <ins>the train set</ins>.
+* `<DATASET>` - any one of `squad`, `NQ`, `musique`
+* `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
+* **output** - trained eraser will be under `/path/to/outdir/<DATASET>/<PROMPT_TYPE>`.
 
-Once the training is finished, you will find the trained eraser under `/path/to/outdir/<DATASET>/<PROMPT_TYPE>`.
-
-Next, to perform the actual prompting of the LLMs with the erasure component, run:
-
+## Prompting with Concept Erasure
+Run:
 ```
 python zero_shot_erasure_prompting.py --models <MODELS> --datasets <DATASETS> --outdir /path/to/outdir --eraser-dir /path/to/trained_eraser --only-first-decoding
 ```
-
-where `<MODELS>` should be replaced by either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML` (or their concatenation - for running on several models), and `<DATASETS>` should be replaced by either one of `squad`, `NQ`, `musique` (or their concatenation - for running on several datasets).
-
-This should save in the outdir folder two pt files - one starting with `un-answerable` and one starting with `answerable`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
-
-To evaluate the responses, follow the instructions under [Evaluation](#evaluation). 
-
-Additionally, to visualize the embeddings, follow the instructions under [Visualize Embedding Space](#visualize-embedding-space).
+* `<MODELS>` and `<DATASETS>` are similar to those in [Zero-shot Prompting](#zero-shot-prompting).
+* **Output**: Saves two `.pt` files in the specified outdir, one for answerable and one for un-answerable prompts.
+  - Also saves the actual generated outputs in the sub-directory **regular_decoding**.
+* To evaluate the responses, follow the instructions under [Evaluation](#evaluation). 
+* To visualize the embeddings, follow the instructions under [Visualize Embedding Space](#visualize-embedding-space).
 
 # Citation
 
