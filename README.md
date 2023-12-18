@@ -2,25 +2,26 @@
 
 Repository for our EMNLP 2023 paper "[The Curious Case of Hallucinatory (Un)answerability: Finding Truths in the Hidden States of Over-Confident Large Language Models](https://aclanthology.org/2023.emnlp-main.220/)"
 
-# Preliminaries
-Begin by setting the `MAX_GPU_MEM` and `MAX_CPU_MEM` parameters in `constants.py` to the maximum GPU and CPU (respectively) memory capacity of the machine you work on.
+# Getting Started
+1. **Configure Memory Settings**: Edit `MAX_GPU_MEM` and `MAX_CPU_MEM` in `constants.py` to match your computer specs' maximum GPU and CPU, respectively.
 
-Additionally, create the conda env of the project by setting the `prefix` variable in `unanswerability_env.yml` to your `path/to/anaconda3/envs/unanswerability_env` location, and then run:
-
+2. **Create a Conda Environment**:
+   * Adjust `prefix` in `unanswerability_env.yml` to your Anaconda environment path.
+   * Run these commands:
 ```
 conda env create -f unanswerability_env.yml
 python -m spacy download en_core_web_sm
 conda activate unanswerability_env
 ```
 # Download Dataset
-To download the dataset, run:
+1. To download the dataset, run:
 ```
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1E3wZLRUi4JZ2ebD0rSKHTq8ISnecOj6_' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1E3wZLRUi4JZ2ebD0rSKHTq8ISnecOj6_" -O data.zip && rm -rf /tmp/cookies.txt
 
 ```
 or directly download the zip file of the data from [link to data zip](https://drive.google.com/file/d/1E3wZLRUi4JZ2ebD0rSKHTq8ISnecOj6_/view?usp=sharing)
 
-and then uzip it:
+2. uzip it:
 ```
 unzip data.zip
 ```
