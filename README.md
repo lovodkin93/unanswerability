@@ -19,9 +19,9 @@ conda activate unanswerability_env
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1E3wZLRUi4JZ2ebD0rSKHTq8ISnecOj6_' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1E3wZLRUi4JZ2ebD0rSKHTq8ISnecOj6_" -O data.zip && rm -rf /tmp/cookies.txt
 
 ```
-or directly download the zip file of the data from [link to data zip](https://drive.google.com/file/d/1E3wZLRUi4JZ2ebD0rSKHTq8ISnecOj6_/view?usp=sharing)
+or directly download the file from [Google Drive](https://drive.google.com/file/d/1E3wZLRUi4JZ2ebD0rSKHTq8ISnecOj6_/view?usp=sharing)
 
-2. uzip it:
+2. uzip:
 ```
 unzip data.zip
 ```
@@ -29,21 +29,22 @@ unzip data.zip
 # Prompt Manipulations and Beam Relaxation Experiments
 
 ## zero-shot Prompting
-To run the zero-shot prompt-manipulation experiment, run the following code:
+To run the zero-shot prompt-manipulation experiment, run:
 ```
 python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-only-generated-text --outdir /path/to/outdir
 ```
-where `<MODELS>` should be replaced by either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML` (or their concatenation - for running on several models), and `<DATASETS>` should be replaced by either one of `squad`, `NQ`, `musique` (or their concatenation - for running on several datasets).
+* Replace `<MODELS>` with either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML`(can pass more than one).
+* Replace `<DATASETS>` with either one of `squad`, `NQ`, `musique` (can pass more than one).
+* For prompt variants, also pass `--prompt-variant <VARIANT_LIST>`, where `<VARIANT_LIST>` could be any one of `variant1`, `variant2`, `variant3` (can pass more than one).
+* For development set experiments, add `--devset`.
 
-This should save in the outdir folder two pt files - one starting with `un-answerable` and one starting with `answerable`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
-It would also save the actual generated outputs in a sub-directory named "regular_decoding".
+- This should save in the outdir folder two pt files - one starting with `un-answerable` and one starting with `answerable`. The former would be the model's responses for the un-answerable prompts, whereas the latter would be the model's responses for the answerable prompts.
+- It would also save the actual generated outputs in a sub-directory named "regular_decoding".
 
-Additionally, to run this script on the develpment set, also pass the `--devset` flag.
 
-Also, to run on different prompt variants (affects only cases where there is a hint of the un-answerability) - pass `--prompt-variant <VARIANT_LIST>` where `<VARIANT_LIST>` could be any concatenation of `variant1`, `variant2`, `variant3` (default is only `variant1`).
 
 ## Few-shot Prompting
-To run the few-shot prompt-manipulation experiment, run the following code:
+To run the few-shot prompt-manipulation experiment, run:
 ```
 python few_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-only-generated-text --outdir /path/to/outdir
 ```
