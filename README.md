@@ -28,34 +28,32 @@ unzip data.zip
 
 # Prompt Manipulations and Beam Relaxation Experiments
 
-## zero-shot Prompting
-To run the zero-shot prompt-manipulation experiment, run:
+## Zero-shot Prompting
+To perform the zero-shot prompt-manipulation experiment, run:
 ```
 python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-only-generated-text --outdir /path/to/outdir
 ```
 * Replace `<MODELS>` with either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML`(can pass more than one).
 * Replace `<DATASETS>` with either one of `squad`, `NQ`, `musique` (can pass more than one).
-* For prompt variants, also pass `--prompt-variant <VARIANT_LIST>`, where `<VARIANT_LIST>` could be any one of `variant1`, `variant2`, `variant3` (can pass more than one).
+* For prompt variants, add `--prompt-variant <VARIANT_LIST>`, where `<VARIANT_LIST>` could be any one of `variant1`, `variant2`, `variant3` (can pass more than one). Default - `variant1`.
 * For development set experiments, add `--devset`.
-* **output**: Saves two `.pt` files in the specified outdir, one for answerable and one for un-answerable prompts.
-  - also saves actual generated outputs in a sub-directory `regular_decoding`.
+* **Output**: Saves two `.pt` files in the specified outdir, one for answerable and one for un-answerable prompts.
+  - Also saves the actual generated outputs in the sub-directory `regular_decoding`.
 
 
 ## Few-shot Prompting
-To run the few-shot prompt-manipulation experiment, run:
+To perform the few-shot prompt-manipulation experiment, run:
 ```
 python few_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-only-generated-text --outdir /path/to/outdir
 ```
-`<MODELS>` and `<DATASETS>` are similar to those in the Zero-shot prompting experiments.
-
-As for the zero-shot case, you can also change the prompt variant by passing `--prompt-variant <VARIANT_LIST>` (`<VARIANT_LIST>` is the same as before).
-
-Lastly, you can choose one of the in-context-learning examples variants by passing `--icl-examples-variant <ICL_VARIANT_LIST>` where `<ICL_VARIANT_LIST>` could be any concatenation of `1`, `2`, `3` (default is only `1`).
+* `<MODELS>` and `<DATASETS>` are similar to those in [Zero-shot Prompting](#zero-shot-prompting).
+* Prompt variant can be changed like in [Zero-shot Prompting](#zero-shot-prompting).
+* For in-context-learning examples variants - add `--icl-examples-variant <ICL_VARIANT_LIST>`, where `<ICL_VARIANT_LIST>` could be any one of `1`, `2`, `3` (can pass more than one). 
 
 ## Beam Relaxation
-To run the beam relaxation experiments, simply run the zero-shot experiment with the additional `--k-beams <BEAM_SIZE>` parameter.
+For beam relaxation experiments, just add `--k-beams <BEAM_SIZE>` to the [Zero-shot Prompting](#zero-shot-prompting) command.
 
-In addition to the actual generated outputs saved in the "regular_decoding" sub-directory, the beam-relaxation version would be saved under the sub-directory "beam-relaxation".
+* **Output**: In addition to the sub-directory `regular_decoding`, an additional `beam-relaxation` sub-directory will be generated, with the beam-relaxed responses.
 
 
 ## Evaluation
