@@ -33,12 +33,14 @@ To perform the zero-shot prompt-manipulation experiment, run:
 ```
 python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-only-generated-text --outdir /path/to/outdir
 ```
-* Replace `<MODELS>` with either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML`(can pass more than one).
-* Replace `<DATASETS>` with either one of `squad`, `NQ`, `musique` (can pass more than one).
-* For prompt variants, add `--prompt-variant <VARIANT_LIST>`, where `<VARIANT_LIST>` could be any one of `variant1`, `variant2`, `variant3` (can pass more than one). Default - `variant1`.
+* `<MODELS>` - either one of `Flan-UL2`, `Flan-T5-xxl`, `OPT-IML`(can pass more than one).
+* `<DATASETS>` - either one of `squad`, `NQ`, `musique` (can pass more than one).
+* For prompt variants, add `--prompt-variant <VARIANT_LIST>`:
+  - `<VARIANT_LIST>` - either one of `variant1`, `variant2`, `variant3` (can pass more than one).
+    - Default - `variant1`.
 * For development set experiments, add `--devset`.
 * **Output**: Saves two `.pt` files in the specified outdir, one for answerable and one for un-answerable prompts.
-  - Also saves the actual generated outputs in the sub-directory `regular_decoding`.
+  - Also saves the actual generated outputs in the sub-directory **regular_decoding**.
 
 
 ## Few-shot Prompting
@@ -48,12 +50,13 @@ python few_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-on
 ```
 * `<MODELS>` and `<DATASETS>` are similar to those in [Zero-shot Prompting](#zero-shot-prompting).
 * Prompt variant can be changed like in [Zero-shot Prompting](#zero-shot-prompting).
-* For in-context-learning examples variants - add `--icl-examples-variant <ICL_VARIANT_LIST>`, where `<ICL_VARIANT_LIST>` could be any one of `1`, `2`, `3` (can pass more than one). 
+* For in-context-learning examples variants - add `--icl-examples-variant <ICL_VARIANT_LIST>`:
+  * `<ICL_VARIANT_LIST>` - either one of `1`, `2`, `3` (can pass more than one). 
 
 ## Beam Relaxation
 For beam relaxation experiments, just add `--k-beams <BEAM_SIZE>` to the [Zero-shot Prompting](#zero-shot-prompting) command.
 
-* **Output**: In addition to the sub-directory `regular_decoding`, an additional `beam-relaxation` sub-directory will be generated, with the beam-relaxed responses.
+* **Output**: In addition to the sub-directory **regular_decoding**, an additional **beam-relaxation** sub-directory will be generated, with the beam-relaxed responses.
 
 
 ## Evaluation
@@ -61,10 +64,11 @@ To evaluate the generated texts, run:
 ```
 python -m evaluation.evaluate --indirs <INDIRS> --outdir /path/to/outdir 
 ```
-
-Where `<INDIRS>` should be all the `outdirs` passed to either one of `zero_shot_prompting.py` or `few_shot_prompting.py` (separated by a single space). This will save under `/path/to/outdir` a csv file `QA-task-results.csv` with the results on the QA task for each of the prompt types (e.g., `Regular-Prompt` or `Hint-Prompt`), and an excel file `unanswerability_classification_results.xlsx`, with the unanswerability classification results for each of the prompt types. 
-
-Additionally, to get the results on the development set, add the parameter `--devset`.
+* `<INDIRS>`: output directories from the prompting experiments.
+* **output**: save under `outdir`:
+  -  `QA-task-results.csv` - results on the QA task for each prompt type (e.g., `Regular-Prompt` or `Hint-Prompt`).
+  -  `unanswerability_classification_results.xlsx` - unanswerability classification results for each prompt type.
+* For results on development set, add `--devset`.
 
 # Probing Experiments
 To run the probing experiments, you first need to run the aforementioned zero-shot experiments **without** the `--return-only-generated-text` parameter, which will also save the embeddings of the generations. In other words, run:
