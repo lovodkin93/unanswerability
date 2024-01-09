@@ -3,11 +3,8 @@
 Repository for our EMNLP 2023 paper "[The Curious Case of Hallucinatory (Un)answerability: Finding Truths in the Hidden States of Over-Confident Large Language Models](https://aclanthology.org/2023.emnlp-main.220/)"
 
 # Getting Started
-1. **Configure Memory Settings**: Edit `MAX_GPU_MEM` and `MAX_CPU_MEM` in `constants.py` to match your computer specs' maximum GPU and CPU, respectively.
-
-2. **Create a Conda Environment**:
-   * Adjust `prefix` in `unanswerability_env.yml` to your Anaconda environment path.
-   * Run these commands:
+* Adjust `prefix` in `unanswerability_env.yml` to your Anaconda environment path.
+* Run these commands:
 ```
 conda env create -f unanswerability_env.yml
 python -m spacy download en_core_web_sm
