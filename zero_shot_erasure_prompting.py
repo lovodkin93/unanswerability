@@ -11,7 +11,7 @@ import pickle
 import argparse
 from pathlib import Path
 import logging
-from constants import *
+from utils import *
 from post_processing.pt_to_benchmarks_evaluate_format import main as pt_to_evaluate_format_converter
 
 # Set the logging level to INFO
@@ -164,8 +164,7 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type
         responses["Question"].extend([musique_Question(sample['Regular-Prompt']) for sample in curr_data])
     return responses
 
-def HF_request(prompts, k_beams, tokenizer, model, lm_head, eraser, only_first_decoding, prompt_suffix):
-    prompts = [f"{p}{prompt_suffix}" for p in prompts]
+def HF_request(prompts, k_beams, tokenizer, model, lm_head, eraser, only_first_decoding):
     input_ids = tokenizer.batch_encode_plus(prompts, 
                                             padding=True,
                                             truncation=True,
@@ -236,12 +235,8 @@ def get_model(args, model_name):
     if not model_name in model_map.keys():
         raise Exception(f"Incorrect model passed: {model_name}")
 
-    # max_memory_dict = {0:'20GiB', 1:"40GiB"}
-    # max_memory_dict['cpu'] = '300GiB'
-    max_memory_dict = {gpu_i:f"{MAX_GPU_MEM}GiB" for gpu_i in range(torch.cuda.device_count())}
-    max_memory_dict['cpu'] = f'{MAX_CPU_MEM}GiB'
-
-    curr_prompt_suffix = ""
+    max_memory_dict = get_max_memory() 
+    
     curr_tokenizer = AutoTokenizer.from_pretrained(model_map[model_name], model_max_length=args.model_max_length)
     if model_name == "Flan-T5-xxl":
         curr_model = T5Model.from_pretrained(model_map[model_name],
@@ -262,7 +257,7 @@ def get_model(args, model_name):
                                                                 max_memory={0:'10GiB', 'cpu':'300GiB'},
                                                                 torch_dtype=torch.float16).lm_head
         
-    return {"output_subdir" : model_name, "kwargs":dict(tokenizer=curr_tokenizer, model=curr_model, lm_head=curr_model_head, prompt_suffix=curr_prompt_suffix)}
+    return {"output_subdir" : model_name, "kwargs":dict(tokenizer=curr_tokenizer, model=curr_model, lm_head=curr_model_head)}
 
 def get_all_relevant_datasets(args):
     data_function_map = {"squad" : get_responses_unanswerable_questions_squad,
@@ -324,8 +319,7 @@ def main(args):
                                                              model=model['kwargs']['model'], 
                                                              lm_head=model['kwargs']['lm_head'], 
                                                              eraser=eraser, 
-                                                             only_first_decoding=args.only_first_decoding, 
-                                                             prompt_suffix=model['kwargs']['prompt_suffix'])
+                                                             only_first_decoding=args.only_first_decoding)
                     torch.save(responses, curr_outdir)
 
     # if not only_answerable_instances and not only_unanswerable_instances - namely we have both answerable and answerable prompts - then convert the pt files to the formats adhering to the evaluation scripts

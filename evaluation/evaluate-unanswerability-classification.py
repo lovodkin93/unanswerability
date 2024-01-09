@@ -8,7 +8,7 @@ from tabulate import tabulate
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from constants import PROMPT_TYPES, UNANSWERABLE_REPLIES, UNANSWERABLE_REPLIES_EXACT
+from utils import PROMPT_TYPES, UNANSWERABLE_REPLIES, UNANSWERABLE_REPLIES_EXACT
 from utils import *
 
 def check_if_unanswerable(response):

@@ -7,7 +7,7 @@ import argparse
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from constants import PROMPT_TYPES
+from utils import PROMPT_TYPES
 from utils import *
 import subprocess
 from pathlib import Path

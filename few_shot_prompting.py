@@ -9,7 +9,7 @@ import os
 import argparse
 from pathlib import Path
 import logging
-from constants import *
+from utils import *
 from post_processing.pt_to_benchmarks_evaluate_format import main as pt_to_evaluate_format_converter
 # Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)
@@ -272,8 +272,7 @@ def get_model(args, model_name):
 
     # max_memory_dict = {0:'20GiB', 1:"40GiB"}
     # max_memory_dict['cpu'] = '300GiB'
-    max_memory_dict = {gpu_i:f"{MAX_GPU_MEM}GiB" for gpu_i in range(torch.cuda.device_count())}
-    max_memory_dict['cpu'] = f'{MAX_CPU_MEM}GiB'
+    max_memory_dict = get_max_memory()
 
     if model_name == "OPT-IML":
         curr_prompt_suffix = "\n Answer:"

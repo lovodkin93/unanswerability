@@ -79,6 +79,8 @@ dependencies:
     - datasets==2.10.1
     - defusedxml==0.7.1
     - dill==0.3.6
+    - en-core-web-sm==3.5.0
+    - et-xmlfile==1.1.0
     - evaluate==0.4.0
     - fastjsonschema==2.16.2
     - filelock==3.9.0
@@ -87,6 +89,7 @@ dependencies:
     - fsspec==2023.1.0
     - google-auth==2.19.1
     - google-auth-oauthlib==0.4.6
+    - gputil==1.4.0
     - grpcio==1.54.2
     - html2text==2020.1.16
     - huggingface-hub==0.12.1
@@ -124,6 +127,7 @@ dependencies:
     - numpy==1.21.6
     - oauthlib==3.2.2
     - openai==0.27.2
+    - openpyxl==3.1.2
     - pandas==1.2.1
     - pandocfilters==1.5.0
     - pathy==0.10.1
