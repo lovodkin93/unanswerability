@@ -82,7 +82,7 @@ Run:
 ```
 python train_linear_classifiers.py --indir <INDIR> --outdir /path/to/outdir --dataset <DATASET> --prompt-type <PROMPT_TYPE> --epochs 100 --batch-size 16 --num-instances 1000
 ```
-* `<INDIR>` - path to the directory with the generated embeddings (pt files) of <ins>the train set</ins>.
+* `<INDIR>` - path to the directory with the saved embeddings (pt files) of <ins>the train set</ins>.
 * `<DATASET>` - any one of `squad`, `NQ`, `musique`.
 * `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
 * To train a classifier on the <ins>first</ins> hidden layer of the first generated token, add `--embedding-type first_hidden_embedding`.
@@ -96,7 +96,7 @@ Run:
 python evaluation/eval_linear_classifiers.py --indir <DATA_INDIR> --classifier-dir <CLASSIFIER_INDIR> --dataset <DATASET> --prompt-type <PROMPT_TYPE> --embedding-type <EMBEDDING_TYPE>
 ```
 
-* `<DATA_INDIR>` - path to directory with the <ins>the test set</ins> pt files.
+* `<DATA_INDIR>` - path to directory with the <ins>the test set</ins> saved embeddings (pt files).
 * `<CLASSIFIER_INDIR>` - path to the trained linear classifier.
 * `<DATASET>` - any one of `squad`, `NQ`, `musique` (should represent the dataset of the test set).
 * `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
