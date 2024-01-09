@@ -130,7 +130,7 @@ Run:
 python train_concept_eraser.py --indir <INDIR> --outdir /path/to/outdir --dataset <DATASET> --prompt-type <PROMPT_TYPE> --epochs 500 --batch-size 16 --num-instances 1000
 ```
 
-* `<INDIR>` - path to the directory with the embeddings (pt files) of <ins>the train set</ins>.
+* `<INDIR>` - path to the directory with the embeddings (pt files) of the <ins>train set</ins>.
 * `<DATASET>` - any one of `squad`, `NQ`, `musique`
 * `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
 * **output** - trained eraser will be under `/path/to/outdir/<DATASET>/<PROMPT_TYPE>`.
