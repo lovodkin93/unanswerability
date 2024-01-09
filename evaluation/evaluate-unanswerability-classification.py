@@ -9,7 +9,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils import PROMPT_TYPES, UNANSWERABLE_REPLIES, UNANSWERABLE_REPLIES_EXACT
-from utils import *
+from evaluation_utils import *
 
 def check_if_unanswerable(response):
     value = str(response).lower().strip()
