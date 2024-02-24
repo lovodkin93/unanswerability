@@ -34,7 +34,7 @@ python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-o
 * `<DATASETS>` - any one of 'squad', 'NQ', or 'musique' (can pass more than one).
 * For prompt variants, add `--prompt-variant <VARIANT_LIST>`:
   - `<VARIANT_LIST>` - any one of 'variant1', 'variant2', 'variant3' (can pass more than one).
-    - Default - `variant1`.
+    - Default - 'variant1'.
 * For development set experiments, add `--devset`.
 * **Output**: Saves two `.pt` files in the specified outdir, one for answerable and one for un-answerable prompts.
   - Also saves the actual generated outputs in the subdir **regular_decoding**.
