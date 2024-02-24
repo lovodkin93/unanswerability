@@ -31,9 +31,16 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, 
                  "Passage":[], 
                  "Question":[]}
 
-    with open(data_path) as f:
-        data = json.load(f)
-        data = data[p_variant][data_type]
+    # get prompts
+    with open("prompts/squad.json", 'r') as f1:
+        prompt_dict = json.loads(f1.read())
+    with open(f"data/raw_data/squad/{args.split}.json", 'r') as f1:
+        raw_data = json.loads(f1.read())
+    data = construct_prompts(prompt_dict=prompt_dict,
+                             raw_data=raw_data,
+                             zero_shot=True,
+                             data_type=data_type,
+                             prompt_variant=p_variant)
     
     if args.n_instances != None:
         data = data[:args.n_instances]
@@ -85,10 +92,18 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, arg
                  "Answerability":[], 
                  "Passage":[], 
                  "Question":[]}
+    
+    # get prompts
+    with open("prompts/NQ.json", 'r') as f1:
+        prompt_dict = json.loads(f1.read())
+    with open(f"data/raw_data/NQ/{args.split}.json", 'r') as f1:
+        raw_data = json.loads(f1.read())
+    data = construct_prompts(prompt_dict=prompt_dict,
+                             raw_data=raw_data,
+                             zero_shot=True,
+                             data_type=data_type,
+                             prompt_variant=p_variant)
 
-    with open(data_path) as f:
-        data = json.load(f)
-        data = data[p_variant][data_type]
 
     if args.n_instances != None:
         data = data[:args.n_instances]
@@ -97,7 +112,7 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, arg
 
     for batch_i in tqdm(range(n_batches)):
         curr_data = data[batch_i*args.batch_size:(batch_i+1)*args.batch_size]
-        responses["ids"].extend([sample["example_id"] for sample in curr_data])
+        responses["ids"].extend([sample["id"] for sample in curr_data])
         responses["annotation_ids"].extend([sample["annotation_id"] for sample in curr_data])
 
         responses["Regular-Prompt"].extend(HF_request([sample['Regular-Prompt'] for sample in curr_data], **kwargs))
@@ -135,9 +150,16 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type
                  "Context":[], 
                  "Question":[]}
 
-    with open(data_path) as f:
-        data = json.load(f)
-        data = data[p_variant][data_type]
+    # get prompts
+    with open("prompts/musique.json", 'r') as f1:
+        prompt_dict = json.loads(f1.read())
+    with open(f"data/raw_data/musique/{args.split}.json", 'r') as f1:
+        raw_data = json.loads(f1.read())
+    data = construct_prompts(prompt_dict=prompt_dict,
+                             raw_data=raw_data,
+                             zero_shot=True,
+                             data_type=data_type,
+                             prompt_variant=p_variant)
 
     if args.n_instances != None:
         data = data[:args.n_instances]
@@ -168,7 +190,7 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type
     return responses
 
 def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suffix, return_only_generated_text, return_first_layer):
-    prompts = [f"{p}{prompt_suffix}" for p in prompts]
+    prompts = [f"{p}{prompt_suffix}" if not p.strip().endswith(prompt_suffix) else p for p in prompts]
 
     input_ids = tokenizer.batch_encode_plus(
         prompts, 
@@ -218,6 +240,7 @@ def HF_request(prompts, k_beams, tokenizer, model, output_max_length, prompt_suf
 def get_model(args, model_name):
     model_map = {"Flan-UL2" : "google/flan-ul2",
                  "Flan-T5-xxl" : "google/flan-t5-xxl",
+                 "Flan-T5-small" : "google/flan-t5-small",
                  "OPT-IML" : "facebook/opt-iml-max-30b"}
 
     if not model_name in model_map.keys():

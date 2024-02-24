@@ -1,0 +1,82 @@
+{
+    "instructions-Regular-Prompt": "Given the following passage and question, answer the question",
+    "instructions-Hint-Prompt-variant1": "Given the following passage and question, answer the question.\n If it cannot be answered based on the passage, reply \"unanswerable\"",
+    "instructions-Hint-Prompt-variant2": "Given the following passage and question, answer the question.\n If you don't know the answer, reply \"IDK\"",
+    "instructions-Hint-Prompt-variant3": "Given the following passage and question, answer the question.\n If there is no correct answer, reply \"N/A\"",
+    "instructions-CoT-Prompt-variant1": "Given the following passage and question, answer the question.\n First make sure if it can be answered by the passage.\n If it cannot be answered based on the passage, reply \"unanswerable\"",
+    "instructions-CoT-Prompt-variant2": "Given the following passage and question, answer the question.\n First make sure if it can be answered by the passage.\n If you don't know the answer, reply \"IDK\"",
+    "instructions-CoT-Prompt-variant3": "Given the following passage and question, answer the question.\n First make sure if it can be answered by the passage.\n If there is no correct answer, reply \"N/A\"",
+    "instructions-Answerability": "Given the following passage and question, decide if the question is answerable based on the passage. Reply only \"answerable\" or \"unanswerable\"",
+    "demo_sep": "\n\n",
+    "demo_prompt_zero_shot": "{INST}:\nPassage: {P}\nQuestion: {Q}",
+    "demo_prompt_few_shot": "Instructions: {INST}.\nPassage: {P}\nQuestion: {Q}\n{A}",
+    "non-CoT-format": "Answer: {FIN_A}",
+    "CoT-format": "Answer: {CoT} So, the answer is: {FIN_A}",
+    "no-answer-response": {
+        "variant1": "unanswerable",
+        "variant2": "IDK",
+        "variant3": "N/A"
+    },
+    "demos": {
+        "demos-v1": {
+            "answerable-1": {
+                "Passage": "Hypoxia differs from hypoxemia and anoxemia in that hypoxia refers to a state in which oxygen supply is insufficient , whereas hypoxemia and anoxemia refer specifically to states that have low or zero arterial oxygen supply . Hypoxia in which there is complete deprivation of oxygen supply is referred to as anoxia .",
+                "Question": "a medical term which means a deficiency but not a total lack of oxygen ?",
+                "CoT": "The passage mentions that Hypoxia is a state in which oxygen supply is insufficient. It further describes that Hypoxia in which there is complete deprivation of oxygen supply is referred to as anoxia, meaning that Hypoxia itself is not a total lack of oxygen.",
+                "Answer": "hypoxia."
+            },
+            "answerable-2": {
+                "Passage": "South Africa have played at six of the eight Rugby World Cup tournaments , having been unable to compete in the first two tournaments due to a sports boycott during the apartheid era . Following the end of apartheid , they hosted the 1995 Rugby World Cup and won the tournament , and were champions again at the 2007 tournament in France . With two tournament wins , they are one of the three best performing teams , along with Australia who have also won twice , and New Zealand with three wins , the only team to do better .",
+                "Question": "when did south africa first win the rugby world cup ?",
+                "CoT": "The passage mentions that South Africa won the 1995 Rugby World Cup. The passage further says that they won again in 2007. Lastly, the passsage says that they had two wins, meaning that the win of 1995 was their first.",
+                "Answer": "1995."
+            },
+            "un-answerable": {
+                "Passage": "The Act of Settlement is an Act of the Parliament of England that was passed in 1701 to settle the succession to the English and Irish crowns on Protestants only . The next Protestant in line to the throne was the Electress Sophia of Hanover , a granddaughter of James VI of Scotland and I of England . After her the crowns would descend only to her non-Roman Catholic heirs .",
+                "Question": "The next Roman in line to the throne ?",
+                "CoT": "In the passage, it is mentioned that the next person in line to the throne is Protestant, and not Roman. It is also said that the crown would descend to her non-Roman heirs.",
+                "Answer": "{NO_ANSWER}."
+            }
+        },
+        "demos-v2": {
+            "answerable-1": {
+                "Passage": "Louise Joy Brown ( born 25 July 1978 ) is an English woman known for being the first human to have been born after conception by in vitro fertilisation , or IVF .",
+                "Question": "when was the first in vitro baby born ?",
+                "CoT": "The passage says that Louise Joy Brown was the first human to have been born by in vitro fertilisation. It also mentions that Louise Joy Brown was born on 25 July 1978.",
+                "Answer": "25 July 1978."
+            },
+            "answerable-2": {
+                "Passage": "The 2018 College Football Playoff National Championship was a college football bowl game that determined the national champion in the NCAA Division I Football Bowl Subdivision for the 2017 season . The Alabama Crimson Tide defeated the Georgia Bulldogs 26 -- 23 in overtime . Alabama overcame a 13 -- 0 deficit at halftime . Tua Tagovailoa and Da'Ron Payne were respectively named the offensive and defensive players of the game .",
+                "Question": "who won the college football national championship tonight ?",
+                "CoT": "The passage mentions starts by talking about the Football Playoff National Championship. It then says that the Alabama Crimson Tide defeated the Georgia Bulldogs.",
+                "Answer": "The Alabama Crimson Tide."
+            },
+            "un-answerable": {
+                "Passage": "The Ranch is an American comedy web television series starring Ashton Kutcher , Danny Masterson , Debra Winger , Elisha Cuthbert , and Sam Elliott that debuted in 2016 on Netflix . The show takes place on the fictional Iron River Ranch in the fictitious small town of Garrison , Colorado ; detailing the life of the Bennetts , a dysfunctional family consisting of two brothers , their rancher father , and his divorced wife and local bar owner . While the opening sequence shows scenes from Ouray , Colorado and surrounding Ouray County , The Ranch is filmed on a sound stage in front of a live audience in Burbank , California . Each season consists of 20 episodes broken up into two parts , each containing 10 episodes .",
+                "Question": "when does the next series of the ranch come out ?",
+                "CoT": "The passage portrays the \"the Ranch\", including when it debuted, but it doesn't say when is its next series.",
+                "Answer": "{NO_ANSWER}."
+            }
+        },
+        "demos-v3": {
+            "answerable-1": {
+                "Passage": "`` Fool ( If You Think It 's Over ) '' is the title of a popular song originally publicly released in 1978 by the British singer - songwriter Chris Rea . Rea also wrote the words and composed the music of the song , which appears on his 1978 debut album , Whatever Happened to Benny Santini ? . The single 's charting success in the USA earned him a Grammy nomination as Best New Artist in 1979 .",
+                "Question": "who sang fool if you think it over ?",
+                "CoT": "The passage says that ``Fool ( If You Think It 's Over )'' is the title of a popular song. It also says that it was originally publicly released by Chris Rea.",
+                "Answer": "Chris Rea."
+            },
+            "answerable-2": {
+                "Passage": "The Mississippi Freedom Democratic Party ( MFDP ) was an American political party created in 1964 as a branch of the populist Freedom Democratic organization in the state of Mississippi during the Civil Rights Movement . It was organized by African Americans and whites from Mississippi to challenge the legitimacy of the regular Mississippi Democratic Party , which allowed participation only by whites , when African Americans made up 40 percent of the state population .",
+                "Question": "why did the mississippi freedom democratic party emerge at the democratic party convention in 1964 ?",
+                "CoT": "The passage says that the Mississippi Freedom Democratic Party was created in 1964. It then says that it was organized to challenge the legitimacy of the regular Mississippi Democratic Party , which allowed participation only by whites , when African Americans made up 40 percent of the state population .",
+                "Answer": "to challenge the legitimacy of the regular Mississippi Democratic Party , which allowed participation only by whites , when African Americans made up 40 percent of the state population."
+            },
+            "un-answerable": {
+                "Passage": "Owing in part to the way in which the United Kingdom , and Northern Ireland , came into being , there is no legally defined term to describe what Northern Ireland ' is ' . There is also no uniform or guiding way to refer to Northern Ireland amongst the agencies of the UK government . For example , the websites of the Office of the Prime Minister of the United Kingdom and the UK Statistics Authority describe the United Kingdom as being made up of four countries , one of these being Northern Ireland . Other pages on the same websites refer to Northern Ireland specifically as a `` province '' as do publications of the UK Statistics Authority . The website of the Northern Ireland Statistics and Research Agency also refers to Northern Ireland as being a province as does the website of the Office of Public Sector Information and other agencies within Northern Ireland . Publications of HM Treasury and the Department of Finance and Personnel of the Northern Ireland Executive , on the other hand , describe Northern Ireland as being a `` region of the UK '' . The UK 's submission to the 2007 United Nations Conference on the Standardization of Geographical Names defines the UK as being made up of two countries ( England and Scotland ) , one principality ( Wales ) and one province ( Northern Ireland ) .",
+                "Question": "why is northern ireland not part of ireland ?",
+                "CoT": "The passage discusses Northern Ireland's unclear legal status as part of the UK. However, it does not mention why is Northern Ireland a part of the UK and not Ireland.",
+                "Answer": "{NO_ANSWER}."
+            }
+        }
+    }
+}

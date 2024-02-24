@@ -1,0 +1,82 @@
+{
+    "instructions-Regular-Prompt": "Given the following passage and question, answer the question",
+    "instructions-Hint-Prompt-variant1": "Given the following passage and question, answer the question.\n    If it cannot be answered based on the passage, reply \"unanswerable\"",
+    "instructions-Hint-Prompt-variant2": "Given the following passage and question, answer the question.\n    If you don't know the answer, reply \"IDK\"",
+    "instructions-Hint-Prompt-variant3": "Given the following passage and question, answer the question.\n    If there is no correct answer, reply \"N/A\"",
+    "instructions-CoT-Prompt-variant1": "Given the following passage and question, answer the question.\n    First make sure if it can be answered by the passage.\n    If it cannot be answered based on the passage, reply \"unanswerable\"",
+    "instructions-CoT-Prompt-variant2": "Given the following passage and question, answer the question.\n    First make sure if it can be answered by the passage.\n    If you don't know the answer, reply \"IDK\"",
+    "instructions-CoT-Prompt-variant3": "Given the following passage and question, answer the question.\n    First make sure if it can be answered by the passage.\n    If there is no correct answer, reply \"N/A\"",
+    "instructions-Answerability": "Given the following passage and question, decide if the question is answerable based on the passage. Reply only \"answerable\" or \"unanswerable\"",
+    "demo_sep": "\n\n",
+    "demo_prompt_zero_shot": "{INST}:\n         Passage: {P} Question: {Q}",
+    "demo_prompt_few_shot": "Instructions: {INST}.\n         Passage: {P} Question: {Q}\n {A}",
+    "non-CoT-format": "Answer: {FIN_A}",
+    "CoT-format": "Answer: {CoT} So, the answer is: {FIN_A}",
+    "no-answer-response": {
+        "variant1": "unanswerable",
+        "variant2": "IDK",
+        "variant3": "N/A"
+    },
+    "demos": {
+        "demos-v1": {
+            "answerable-1": {
+                "Passage": "Madonna released the Material Girl clothing line, which she designed with her daughter, Lourdes. The 1980s inspired clothing line, borrowed from Madonna's punk-girl style when she rose to fame in the 1980s, was released under the Macy's label. Madonna also opened a series of fitness centers around the world named Hard Candy Fitness. In November 2011, Madonna and MG Icon announced the release of a second fashion brand called Truth or Dare by Madonna to include footwear, underclothing, and accessories. She also directed her second feature film, W.E., a biographic about the affair between King Edward VIII and Wallis Simpson; it was co-written with Alek Keshishian. Critical and commercial response to the film was negative. Madonna contributed the ballad \"Masterpiece\" for the film's soundtrack, which won her a Golden Globe Award for Best Original Song.",
+                "Question": "Material Girl clothing line is released under which brand?",
+                "CoT": "\"Material Girl clothing line\" is first mentioned in the first sentence of the passage. The second sentence further discusses the clothing line, saying that it \"was released under the Macy's label\".",
+                "Answer": "Macy's."
+            },
+            "answerable-2": {
+                "Passage": "In 1919 Father James Burns became president of Notre Dame, and in three years he produced an academic revolution that brought the school up to national standards by adopting the elective system and moving away from the university's traditional scholastic and classical emphasis. By contrast, the Jesuit colleges, bastions of academic conservatism, were reluctant to move to a system of electives. Their graduates were shut out of Harvard Law School for that reason. Notre Dame continued to grow over the years, adding more colleges, programs, and sports teams. By 1921, with the addition of the College of Commerce, Notre Dame had grown from a small college to a university with five colleges and a professional law school. The university continued to expand and add new residence halls and buildings with each subsequent president.",
+                "Question": "Over how many years did the change to national standards undertaken at Notre Dame in the early 20th century take place?",
+                "CoT": "The \"national standards\" are mentioned in the first sentence of the passage, where it is stated that \"In 1919 Father James Burns became president of Notre Dame, and in three years he produced an academic revolution that brought the school up to national standards\".",
+                "Answer": "three years."
+            },
+            "un-answerable": {
+                "Passage": "The descendants of Rollo's Vikings and their Frankish wives would replace the Norse religion and Old Norse language with Catholicism (Christianity) and the Gallo-Romance language of the local people, blending their maternal Frankish heritage with Old Norse traditions and customs to synthesize a unique \"Norman\" culture in the north of France. The Norman language was forged by the adoption of the indigenous langue d'oïl branch of Romance by a Norse-speaking ruling class, and it developed into the regional language that survives today.",
+                "Question": "What was replaced with the Norse religion?",
+                "CoT": "In the passage, it is mentioned that Norse religion was replaced with Catholicism, whereas the question asks about the entity which was replaced by Norse religion. No such information is provided in the passage.",
+                "Answer": "{NO_ANSWER}."
+            }
+        },
+        "demos-v2": {
+            "answerable-1": {
+                "Passage": "In November 2013 MGM and the McClory estate formally settled the issue with Danjaq, LLC—sister company of Eon Productions—with MGM acquiring the full copyright film rights to the concept of Spectre and all of the characters associated with it. With the acquisition of the film rights and the organisation's re-introduction to the series' continuity, the SPECTRE acronym was discarded and the organisation reimagined as \"Spectre\".",
+                "Question": "Which two parties settled the issue in November 2003?",
+                "CoT": "The passage starts by saying that in November 2013 MGM and Mclory estate formally stated the issue with Danjaq.",
+                "Answer": "MGM and the McClory estate."
+            },
+            "answerable-2": {
+                "Passage": "Genome composition is used to describe the make up of contents of a haploid genome, which should include genome size, proportions of non-repetitive DNA and repetitive DNA in details. By comparing the genome compositions between genomes, scientists can better understand the evolutionary history of a given genome.",
+                "Question": "What aspect of a genome can genome compositions help researchers in learning about?",
+                "CoT": "The second paragraph sentence mentions that comparing genome composition can help scientists better understand the evolutionary history of a given genome. This evolutionary history is one aspect of a genome.",
+                "Answer": "evolutionary history."
+            },
+            "un-answerable": {
+                "Passage": "The story focuses on series protagonist Link, who tries to prevent Hyrule from being engulfed by a corrupted parallel dimension known as the Twilight Realm. To do so, he takes the form of both a Hylian and a wolf, and is assisted by a mysterious creature named Midna. The game takes place hundreds of years after Ocarina of Time and Majora's Mask, in an alternate timeline from The Wind Waker.",
+                "Question": "What land does Ocarina serve to protect?",
+                "CoT": "In the passage, the only character mentioned as trying to save some land is Link, where as the question asks what country does Ocarina serves to protect. No such information is provided in the passage.",
+                "Answer": "{NO_ANSWER}."
+            }
+        },
+        "demos-v3": {
+            "answerable-1": {
+                "Passage": "Thomas Newman returned as Spectre's composer. Rather than composing the score once the film had moved into post-production, Newman worked during filming. The theatrical trailer released in July 2015 contained a rendition of John Barry's On Her Majesty's Secret Service theme. Mendes revealed that the final film would have more than one hundred minutes of music. The soundtrack album was released on 23 October 2015 in the UK and 6 November 2015 in the USA on the Decca Records label.",
+                "Question": "Who wrote the music for Spectre?",
+                "CoT": "The passage starts by saying that Thomas Newman returned as Spectra's composer. That means that he was the one to write its music.",
+                "Answer": "Thomas Newman."
+            },
+            "answerable-2": {
+                "Passage": "Between 64 and 104 major aftershocks, ranging in magnitude from 4.0 to 6.1, were recorded within 72 hours of the main quake. According to Chinese official counts, \"by 12:00 CST, November 6, 2008 there had been 42,719 total aftershocks, of which 246 ranged from 4.0 MS to 4.9 MS, 34 from 5.0 MS to 5.9 MS, and 8 from 6.0 Ms to 6.4 MS; the strongest aftershock measured 6.4 MS.\" The latest aftershock exceeding M6 occurred on August 5, 2008.",
+                "Question": "What do the Chinese say is the total number of shocks after the quake?",
+                "CoT": "The first paragraph sentence discusses the number of aftershocks following the earthquake. The second paragraph sentence says that according to Chinese official counts, the total number was 42,719.",
+                "Answer": "42,719"
+            },
+            "un-answerable": {
+                "Passage": "Both the number of base pairs and the number of genes vary widely from one species to another, and there is only a rough correlation between the two (an observation known as the C-value paradox). At present, the highest known number of genes is around 60,000, for the protozoan causing trichomoniasis (see List of sequenced eukaryotic genomes), almost three times as many as in the human genome.",
+                "Question": "What is the highest known number of species?",
+                "CoT": "In the passage, it is mentioned that the highest known number of genes is around 60,000, whereas the question asks about the highest number of species. No such information is provided in the passage.",
+                "Answer": "{NO_ANSWER}."
+            }
+        }
+    }
+}

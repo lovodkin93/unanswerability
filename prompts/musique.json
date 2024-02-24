@@ -1,0 +1,82 @@
+{
+    "instructions-Regular-Prompt": "Given the following context and question, answer the question",
+    "instructions-Hint-Prompt-variant1": "Given the following context and question, answer the question.\n If it cannot be answered based on the context, reply \"unanswerable\"",
+    "instructions-Hint-Prompt-variant2": "Given the following context and question, answer the question.\n If you don't know the answer, reply \"IDK\"",
+    "instructions-Hint-Prompt-variant3": "Given the following context and question, answer the question.\n If there is no correct answer, reply \"N/A\"",
+    "instructions-CoT-Prompt-variant1": "Given the following context and question, answer the question.\n First make sure if it can be answered by the context.\n If it cannot be answered based on the context, reply \"unanswerable\"",
+    "instructions-CoT-Prompt-variant2": "Given the following context and question, answer the question.\n First make sure if it can be answered by the context.\n If you don't know the answer, reply \"IDK\"",
+    "instructions-CoT-Prompt-variant3": "Given the following context and question, answer the question.\n First make sure if it can be answered by the context.\n If there is no correct answer, reply \"N/A\"",
+    "instructions-Answerability": "Given the following context and question, decide if the question is answerable based on the context. Reply only \"answerable\" or \"unanswerable\"",
+    "demo_sep": "\n\n",
+    "demo_prompt_zero_shot": "{INST}:\nContext: {P}\nQuestion: {Q}",
+    "demo_prompt_few_shot": "Instructions: {INST}.\nContext: {P}\nQuestion: {Q}\n{A}",
+    "non-CoT-format": "Answer: {FIN_A}",
+    "CoT-format": "Answer: {CoT} So, the answer is: {FIN_A}",
+    "no-answer-response": {
+        "variant1": "unanswerable",
+        "variant2": "IDK",
+        "variant3": "N/A"
+    },
+    "demos": {
+        "demos-v1": {
+            "answerable-1": {
+                "Passage": "Paragraph 1: South Africa have played at six of the eight Rugby World Cup tournaments, having been unable to compete in the first two tournaments due to a sports boycott during the apartheid era. Following the end of apartheid, they hosted the 1995 Rugby World Cup and won the tournament.\n Paragraph 2: With two tournament wins, South Africa is one of the three best performing teams, along with Australia who have also won twice, and New Zealand with three wins, the only team to do better.",
+                "Question": "How many times did the winner of the 1995 Rugby World Cup win in total?",
+                "CoT": "Paragraph 1 mentions that the winner of the 1995 Rugby World Cup was South Africa. Paragraph 2 mentions that South Africa had two tournament wins.",
+                "Answer": "two times."
+            },
+            "answerable-2": {
+                "Passage": "Paragraph 1: Barack Obama is an American politician who served as the 44th president of the United States from 2009 to 2017.\n Pargaraph 2: Obama married Michelle on October 3, 1992, after being engaged for almost a year.\n Paragraph 3: Barack Obama was born in Honolulu, Hawaii. After graduating from Columbia University in 1983, he worked as a community organizer in Chicago.",
+                "Question": "What is the name of the wife of the American president who was born in Hawaii?",
+                "CoT": "Paragraph 1 mentions that Barack Obama was an American President. Paragraph 3 mentions that Barack Obama was born in Hawaii, making him the American president born in Hawaii. Paragraph 2 mentions that he married Michelle.",
+                "Answer": "Michelle"
+            },
+            "un-answerable": {
+                "Passage": "Paragraph 1: Barack Obama is an American politician who served as the 44th president of the United States from 2009 to 2017.\n Pargaraph 2: Obama married Michelle on October 3, 1992, after being engaged for almost a year.",
+                "Question": "What is the name of the wife of the American president who was born in New York?",
+                "CoT": "Paragraph 1 mentions that Barack Obama was an American President. Paragraph 2 mentions that he married Michelle, but it doesn't say where he was born. The context doesn't have information on an american president born in New York.",
+                "Answer": "{NO_ANSWER}."
+            }
+        },
+        "demos-v2": {
+            "answerable-1": {
+                "Passage": "Paragraph 1: Kaya toast is a well-known snack in Singapore. Kaya toast is prepared with kaya (coconut jam), a topping of sugar, coconut milk and eggs, pandan, and sometimes margarine or butter. Kaya is generally served on toast, and also sometimes on crackers. It is considered a breakfast staple, and remains popular in Singapore. The dish is sometimes dipped into soft-boiled egg with a little dark soy sauce and white pepper.\n Paragraph 2: A justice of the peace in Singapore derives his powers from statute law. He is appointed by the President of the Republic of Singapore, under the provisions of section 11 (l) of the Subordinate Courts Act (Cap. 321). The President may revoke the appointment of any justice of the peace. A newly appointed justice of the peace is required by section 17 of the Subordinate Courts Act, to take the oath of office and allegiance as set out in the schedule to the Subordinate Courts Act, before exercising the functions of his office.",
+                "Question": "How do you become a justice of peace in the country where Kaya toast is popular?",
+                "CoT": "Paragraph 1 mentions that Kaya toast is a well-known snack in Singapore. Paragraph 2 says that a justice of peace in Singapore derives his powers from statute law. It also says that he is appointed by the President of the Republic of Singapore.",
+                "Answer": "appointed by the President of the Republic of Singapore."
+            },
+            "answerable-2": {
+                "Passage": "Paragraph 1: Mount Henry is located in the Lewis Range, Glacier National Park in the U.S. state of Montana. Mount Henry is just south of Appistoki Peak in the Two Medicine region of the park.\n Paragraph 2: KJRZ-LP (105.3 FM) was a radio station in Libby, Montana. It was owned and operated by the Libby Area Chamber of Commerce.\n Paragraph 3: The Lewis Range is a mountain range located in the Rocky Mountains of northern Montana, United States and extreme southern Alberta, Canada. It was formed as a result of the Lewis Overthrust, a geologic thrust fault resulted in the overlying of younger Cretaceous rocks by older Proterozoic rocks. The range is located within Waterton Lakes National Park in Alberta, Canada and Glacier National Park and the Bob Marshall Wilderness Complex in Montana, United States. The highest peak is Mount Cleveland at .",
+                "Question": "In what mountain group is the range of which Mount Henry from the state where KJRZ-LP is located is part?",
+                "CoT": "Paragraph 2 says that KJRZ-LP was in Libby, Montana. Paragraph 1 mentions that Mount Henry is located in the Lewis Range. It also says that Lewis Range is in the state of Montana. Paragraph 3 mentions that the Lewis Range is located in the Rocky Mountains.",
+                "Answer": "Rocky Mountains"
+            },
+            "un-answerable": {
+                "Passage": "Paragraph 1: WODS (103.3 MHz) - known on-air as 103.3 AMP Radio - is a commercial FM radio station in Boston, Massachusetts. WODS airs a Top 40 (CHR) radio format, and is owned by Entercom. Its studios and offices are located on Leo M. Birmingham Parkwary in Brighton.\n Paragraph 2: The Embassy of the United States to the Republic of Indonesia is located in Jakarta just south of the Monas at Jalan Medan Merdeka Selatan.\n Paragraph 3: Westminster College is a private liberal arts college located in the Sugar House neighborhood of Salt Lake City, Utah, United States. The college comprises four schools: the School of Arts and Sciences, the Bill and Vieve Gore School of Business, the School of Education, and the School of Nursing and Health Sciences. It is the only accredited liberal arts college in the state of Utah.\n Paragraph 4: The Shorter House is located at the end of Andrews Road in Thompson Ridge, a hamlet in the Town of Crawford in Orange County, New York, United States. It is a late 18th-century building later modified in the Greek Revival style.",
+                "Question": "What is the business category of Crawford House, located in the same city as WODS and the same state as Wellesley College in Mona Lisa Smile?",
+                "CoT": "Paragraph 1 says that WODS is location in Boston. However, no paragraph talks about which state Wellesley College.",
+                "Answer": "{NO_ANSWER}."
+            }
+        },
+        "demos-v3": {
+            "answerable-1": {
+                "Passage": "Paragraph 1: Meet Me in St. Louis is a musical film made by Metro - Goldwyn - Mayer and released in 1944. Divided into a series of seasonal vignettes, starting with Summer 1903, it relates the story of a year in the life of the Smith family in St. Louis, leading up to the opening of the Louisiana Purchase Exposition (more commonly referred to as the World's Fair) in the spring of 1904. The picture stars Judy Garland, Margaret O'Brien, Mary Astor, Lucille Bremer, Tom Drake, Leon Ames, Marjorie Main, June Lockhart, and Joan Carroll.\n Paragraph 2: Gracie is a 2007 American sports drama film directed by Davis Guggenheim. It stars Carly Schroeder as Gracie Bowen, Dermot Mulroney as Bryan Bowen, Elisabeth Shue as Lindsay Bowen, Jesse Lee Soffer as Johnny Bowen, and Andrew Shue as Coach Owen Clark.\n Paragraph 3: He was born Philip Davis Guggenheim in St. Louis, Missouri, United States, the son of Marion Davis and film director and producer Charles Guggenheim. His father was Jewish, whereas his mother was Episcopalian. He graduated from the Potomac School (McLean, Virginia) (1979), from Sidwell Friends School (1982), and from Brown University (1986).",
+                "Question": "When does Meet Me in the birthplace of Gracie's director take place?",
+                "CoT": "Paragraph 2 mentions that Garcie was directed by Davis Guggenheim. Paragraph 3 says that Davis Guggenheim was born in St. Louis. Paragraph 1 says that Meet Me in St. Louis starts with Summer 1903.",
+                "Answer": "starting with Summer 1903."
+            },
+            "answerable-2": {
+                "Passage": "Paragraph 1: The city has a Mayor and is one of the 16 cities and towns in England and Wales to have a ceremonial sheriff who acts as a deputy for the Mayor. The current and 793rd Mayor of Southampton is Linda Norris. Catherine McEwing is the current and 578th sherriff. The town crier from 2004 until his death in 2014 was John Melody, who acted as master of ceremonies in the city and who possessed a cry of 104 decibels.\n Paragraph 2: John May (born 26 September 1849 in Southampton, Hampshire; date of death unknown) was an English cricketer. May was a right-handed batsman who was a right-arm fast bowler.",
+                "Question": "Who is the current mayor of the birthplace of John May?",
+                "CoT": "Paragraph 2 says that John May was born in Southampton. Paragraph 1 mentions that the current Mayor of Southampton is Linda Norris.",
+                "Answer": "Linda Norris"
+            },
+            "un-answerable": {
+                "Passage": "Paragraph 1: Imran Khan has held the office of Prime Minister since 18 August 2018, following the outcome of nationwide general elections held on 25 July 2018.\n Paragraph 2: Hampi, also referred to as the Group of Monuments at Hampi, is a UNESCO World Heritage Site located in east - central Karnataka, India. It became the centre of the Hindu Vijayanagara Empire capital in the 14th century. Chronicles left by Persian and European travellers, particularly the Portuguese, state Hampi was a prosperous, wealthy and grand city near the Tungabhadra River, with numerous temples, farms and trading markets. By 1500 CE, Hampi - Vijayanagara was the world's second - largest medieval - era city after Beijing, and probably India's richest at that time, attracting traders from Persia and Portugal. The Vijayanagara Empire was defeated by a coalition of Muslim sultanates; its capital was conquered, pillaged and destroyed by sultanate armies in 1565, after which Hampi remained in ruins.\n Paragraph 3: As of June 2018, the Government of Karnataka consists of 27 ministers including Chief Minister and a Deputy Chief Minister.\n Paragraph 4: Thekkady (Idukki district) is the location of the Periyar National Park, which is an important tourist attraction in the Kerala state of India.",
+                "Question": "As of 2018, who is the minister of the state where hampi tourist place is located?",
+                "CoT": "Paragraph 2 mentions that Hampi is located in east - central Karnataka, India. Paragraph 3 says that as of June 2018, the Government of Karnataka consists of 27 ministers including Chief Minister and a Deputy Chief Minister, but it doesn't say who they are.",
+                "Answer": "{NO_ANSWER}."
+            }
+        }
+    }
+}
