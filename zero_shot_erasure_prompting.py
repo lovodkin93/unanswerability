@@ -33,9 +33,17 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, 
                  "Passage":[], 
                  "Question":[]}
 
-    with open(data_path) as f:
-        data = json.load(f)
-        data = data[p_variant][data_type]
+    # get prompts
+    with open("prompts/squad.json", 'r') as f1:
+        prompt_dict = json.loads(f1.read())
+    with open(f"raw_data/squad/test.json", 'r') as f1:
+        raw_data = json.loads(f1.read())
+    data = construct_prompts(prompt_dict=prompt_dict,
+                             raw_data=raw_data,
+                             zero_shot=True,
+                             data_type=data_type,
+                             prompt_variant=p_variant)
+    
     if args.n_instances != None:
         data = data[:args.n_instances]
 
@@ -87,9 +95,17 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, arg
                  "Passage":[], 
                  "Question":[]}
 
-    with open(data_path) as f:
-        data = json.load(f)
-        data = data[p_variant][data_type]
+    # get prompts
+    with open("prompts/NQ.json", 'r') as f1:
+        prompt_dict = json.loads(f1.read())
+    with open(f"raw_data/NQ/test.json", 'r') as f1:
+        raw_data = json.loads(f1.read())
+    data = construct_prompts(prompt_dict=prompt_dict,
+                             raw_data=raw_data,
+                             zero_shot=True,
+                             data_type=data_type,
+                             prompt_variant=p_variant)
+    
     if args.n_instances != None:
         data = data[:args.n_instances]
 
@@ -134,9 +150,17 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type
                  "Context":[], 
                  "Question":[]}
 
-    with open(data_path) as f:
-        data = json.load(f)
-        data = data[p_variant][data_type]
+    # get prompts
+    with open("prompts/musique.json", 'r') as f1:
+        prompt_dict = json.loads(f1.read())
+    with open(f"raw_data/musique/test.json", 'r') as f1:
+        raw_data = json.loads(f1.read())
+    data = construct_prompts(prompt_dict=prompt_dict,
+                             raw_data=raw_data,
+                             zero_shot=True,
+                             data_type=data_type,
+                             prompt_variant=p_variant)
+    
     if args.n_instances != None:
         data = data[:args.n_instances]
 

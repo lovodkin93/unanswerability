@@ -34,7 +34,7 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, 
     # get prompts
     with open("prompts/squad.json", 'r') as f1:
         prompt_dict = json.loads(f1.read())
-    with open(f"data/raw_data/squad/{args.split}.json", 'r') as f1:
+    with open(f"raw_data/squad/{args.split}.json", 'r') as f1:
         raw_data = json.loads(f1.read())
     data = construct_prompts(prompt_dict=prompt_dict,
                              raw_data=raw_data,
@@ -96,7 +96,7 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, arg
     # get prompts
     with open("prompts/NQ.json", 'r') as f1:
         prompt_dict = json.loads(f1.read())
-    with open(f"data/raw_data/NQ/{args.split}.json", 'r') as f1:
+    with open(f"raw_data/NQ/{args.split}.json", 'r') as f1:
         raw_data = json.loads(f1.read())
     data = construct_prompts(prompt_dict=prompt_dict,
                              raw_data=raw_data,
@@ -153,7 +153,7 @@ def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type
     # get prompts
     with open("prompts/musique.json", 'r') as f1:
         prompt_dict = json.loads(f1.read())
-    with open(f"data/raw_data/musique/{args.split}.json", 'r') as f1:
+    with open(f"raw_data/musique/{args.split}.json", 'r') as f1:
         raw_data = json.loads(f1.read())
     data = construct_prompts(prompt_dict=prompt_dict,
                              raw_data=raw_data,
