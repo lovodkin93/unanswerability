@@ -30,10 +30,10 @@ To perform the zero-shot prompt-manipulation experiment, run:
 ```
 python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-only-generated-text --outdir /path/to/outdir
 ```
-* `<MODELS>` - any one of `Flan-UL2`, `Flan-T5-xxl`, or `OPT-IML`(can pass more than one).
-* `<DATASETS>` - any one of `squad`, `NQ`, or `musique` (can pass more than one).
+* `<MODELS>` - any one of 'Flan-UL2', 'Flan-T5-xxl', or 'OPT-IML' (can pass more than one).
+* `<DATASETS>` - any one of 'squad', 'NQ', or 'musique' (can pass more than one).
 * For prompt variants, add `--prompt-variant <VARIANT_LIST>`:
-  - `<VARIANT_LIST>` - any one of `variant1`, `variant2`, `variant3` (can pass more than one).
+  - `<VARIANT_LIST>` - any one of 'variant1', 'variant2', 'variant3' (can pass more than one).
     - Default - `variant1`.
 * For development set experiments, add `--devset`.
 * **Output**: Saves two `.pt` files in the specified outdir, one for answerable and one for un-answerable prompts.
@@ -48,7 +48,7 @@ python few_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-on
 * `<MODELS>` and `<DATASETS>` are similar to those in [Zero-shot Prompting](#zero-shot-prompting).
 * Prompt variant can be changed like in [Zero-shot Prompting](#zero-shot-prompting).
 * For in-context-learning examples variants - add `--icl-examples-variant <ICL_VARIANT_LIST>`:
-  * `<ICL_VARIANT_LIST>` - any one of `1`, `2`, `3` (can pass more than one). 
+  * `<ICL_VARIANT_LIST>` - any one of '1', '2', '3' (can pass more than one). 
 
 ## Beam Relaxation
 For beam relaxation experiments, just add `--k-beams <BEAM_SIZE>` to the [Zero-shot Prompting](#zero-shot-prompting) command.
