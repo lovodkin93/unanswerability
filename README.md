@@ -37,7 +37,7 @@ python zero_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-o
     - Default - `variant1`.
 * For development set experiments, add `--devset`.
 * **Output**: Saves two `.pt` files in the specified outdir, one for answerable and one for un-answerable prompts.
-  - Also saves the actual generated outputs in the sub-directory **regular_decoding**.
+  - Also saves the actual generated outputs in the subdir **regular_decoding**.
 
 
 ## Few-shot Prompting
@@ -53,7 +53,7 @@ python few_shot_prompting.py --models <MODELS> --datasets <DATASETS> --return-on
 ## Beam Relaxation
 For beam relaxation experiments, just add `--k-beams <BEAM_SIZE>` to the [Zero-shot Prompting](#zero-shot-prompting) command.
 
-* **Output**: In addition to the sub-directory **regular_decoding**, an additional **beam-relaxation** sub-directory will be generated, with the beam-relaxed responses.
+* **Output**: In addition to the subdir **regular_decoding**, an additional **beam-relaxation** subdir will be generated, with the beam-relaxed responses.
 
 
 ## Evaluation
@@ -142,7 +142,7 @@ python zero_shot_erasure_prompting.py --models <MODELS> --datasets <DATASETS> --
 ```
 * `<MODELS>` and `<DATASETS>` are similar to those in [Zero-shot Prompting](#zero-shot-prompting).
 * **Output**: Saves two `.pt` files in the specified outdir, one for answerable and one for un-answerable prompts.
-  - Also saves the actual generated outputs in the sub-directory **regular_decoding**.
+  - Also saves the actual generated outputs in the subdir **regular_decoding**.
 * To evaluate the responses, follow the instructions under [Evaluation](#evaluation). 
 * To visualize the embeddings, follow the instructions under [Visualize Embedding Space](#visualize-embedding-space).
 
