@@ -23,7 +23,7 @@ or directly download the file from [Google Drive](https://drive.google.com/file/
 unzip raw_data.zip
 ```
 
-# Prompt Manipulations and Beam Relaxation Experiments
+# Prompt Manipulations and Beam Relaxation
 
 ## Zero-shot Prompting
 To perform the zero-shot prompt-manipulation experiment, run:
