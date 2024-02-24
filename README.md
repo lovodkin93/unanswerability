@@ -83,11 +83,11 @@ Run:
 python train_linear_classifiers.py --indir <INDIR> --outdir /path/to/outdir --dataset <DATASET> --prompt-type <PROMPT_TYPE> --epochs 100 --batch-size 16 --num-instances 1000
 ```
 * `<INDIR>` - path to the directory with the saved embeddings (pt files) of the <ins>train set</ins>.
-* `<DATASET>` - any one of `squad`, `NQ`, `musique`.
-* `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
+* `<DATASET>` - any one of 'squad', 'NQ', 'musique'.
+* `<PROMPT_TYPE>` - 'Regular-Prompt' or 'Hint-Prompt'.
 * To train a classifier on the <ins>first</ins> hidden layer of the first generated token, add `--embedding-type first_hidden_embedding`.
 * **output** - save under `outdir/<DATASET>/<EMBEDDING_TYPE>/<PROMPT_TYPE>/only_first_tkn/<MODEL_NAME>_1000N"` the trained classifier.
-  * `<EMBEDDING_TYPE>` - `first_hidden_embedding` or `last_hidden_embedding`.
+  * `<EMBEDDING_TYPE>` - 'first_hidden_embedding' or 'last_hidden_embedding'.
   * `<MODEL_NAME>` - name of the model whose embeddings were used to train the classifier.
 
 ### Evaluate Answerability Linear Classifiers
