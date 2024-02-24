@@ -86,7 +86,7 @@ python train_linear_classifiers.py --indir <INDIR> --outdir /path/to/outdir --da
 * `<DATASET>` - any one of 'squad', 'NQ', 'musique'.
 * `<PROMPT_TYPE>` - 'Regular-Prompt' or 'Hint-Prompt'.
 * To train a classifier on the <ins>first</ins> hidden layer of the first generated token, add `--embedding-type first_hidden_embedding`.
-* **output** - save under `outdir/<DATASET>/<EMBEDDING_TYPE>/<PROMPT_TYPE>/only_first_tkn/<MODEL_NAME>_1000N"` the trained classifier.
+* **output** - save under "outdir/<DATASET>/<EMBEDDING_TYPE>/<PROMPT_TYPE>/only_first_tkn/<MODEL_NAME>_1000N" the trained classifier.
   * `<EMBEDDING_TYPE>` - 'first_hidden_embedding' or 'last_hidden_embedding'.
   * `<MODEL_NAME>` - name of the model whose embeddings were used to train the classifier.
 
@@ -98,9 +98,9 @@ python evaluation/eval_linear_classifiers.py --indir <DATA_INDIR> --classifier-d
 
 * `<DATA_INDIR>` - path to directory with the <ins>test set</ins> saved embeddings (pt files).
 * `<CLASSIFIER_INDIR>` - path to the trained linear classifier.
-* `<DATASET>` - any one of `squad`, `NQ`, `musique` (should represent the dataset of the test set).
-* `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
-*  `<EMBEDDING_TYPE>` - `first_hidden_embedding` or `last_hidden_embedding`.
+* `<DATASET>` - any one of 'squad', 'NQ', 'musique' (should represent the dataset of the test set).
+* `<PROMPT_TYPE>` - 'Regular-Prompt' or 'Hint-Prompt'.
+*  `<EMBEDDING_TYPE>` - 'first_hidden_embedding' or 'last_hidden_embedding'.
 
 ### Visualize Embedding Space
 Run:
@@ -109,8 +109,8 @@ Run:
 python figures_generation/PCA_plots_generation.py -i /path/to/folder/with/pt_files -o /path/to/outdir --prompt-type <PROMPT_TYPE> 
 ```
 
-* `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
-* **output** - The generated 3-D PCA plots of the embedding space will be saved under `/path/to/outdir/last_hidden_embedding/only_first_tkn/<PROMPT_TYPE>`.
+* `<PROMPT_TYPE>` - 'Regular-Prompt' or 'Hint-Prompt'.
+* **output** - The generated 3-D PCA plots of the embedding space will be saved under "/path/to/outdir/last_hidden_embedding/only_first_tkn/<PROMPT_TYPE>".
 
 # Answerability Subspace Erasure
 ## Preliminaries
@@ -131,9 +131,9 @@ python train_concept_eraser.py --indir <INDIR> --outdir /path/to/outdir --datase
 ```
 
 * `<INDIR>` - path to the directory with the embeddings (pt files) of the <ins>train set</ins>.
-* `<DATASET>` - any one of `squad`, `NQ`, `musique`
-* `<PROMPT_TYPE>` - `Regular-Prompt` or `Hint-Prompt`.
-* **output** - trained eraser will be under `/path/to/outdir/<DATASET>/<PROMPT_TYPE>`.
+* `<DATASET>` - any one of 'squad', 'NQ', 'musique'
+* `<PROMPT_TYPE>` - 'Regular-Prompt' or 'Hint-Prompt'
+* **output** - trained eraser will be under "/path/to/outdir/<DATASET>/<PROMPT_TYPE>"
 
 ## Prompting with Concept Erasure
 Run:
