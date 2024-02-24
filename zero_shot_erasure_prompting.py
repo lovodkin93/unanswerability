@@ -17,7 +17,7 @@ from post_processing.pt_to_benchmarks_evaluate_format import main as pt_to_evalu
 # Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)
 
-def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, args, **kwargs):
+def get_responses_unanswerable_questions_squad(p_variant, data_type, args, **kwargs):
 
     def squad_Passage(full_prompt):
         return full_prompt[full_prompt.index("Passage:"):full_prompt.index("Question:")].replace("Passage:", "").strip()
@@ -78,7 +78,7 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, data_type, 
         responses["Question"].extend([squad_Question(sample['Regular-Prompt']) for sample in curr_data])
     return responses
 
-def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, args, **kwargs):
+def get_responses_unanswerable_questions_NQ(p_variant, data_type, args, **kwargs):
 
     def NQ_Passage(full_prompt):
         return full_prompt[full_prompt.index("Passage:"):full_prompt.index("Question:")].replace("Passage:", "").strip()
@@ -134,7 +134,7 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, data_type, arg
         responses["Question"].extend([NQ_Question(sample['Regular-Prompt']) for sample in curr_data])
     return responses
 
-def get_responses_unanswerable_questions_musique(data_path, p_variant, data_type, args, **kwargs):
+def get_responses_unanswerable_questions_musique(p_variant, data_type, args, **kwargs):
 
     def musique_Context(full_prompt):
         return full_prompt[full_prompt.index("Context:"):full_prompt.index("Question:")].replace("Context:", "").strip()
@@ -333,9 +333,7 @@ def main(args):
                         print(f"{curr_outdir} exists! skipping...")
                         continue
                     
-                    data_path = fr"data/prompts/{dataset['data_name']}/zero_shot/test.json"
-                    responses = dataset['get_data_function'](data_path=data_path, 
-                                                             p_variant=p_variant,
+                    responses = dataset['get_data_function'](p_variant=p_variant,
                                                              data_type=dataset['type'],
                                                              args=args,
                                                              k_beams=k_beams, 

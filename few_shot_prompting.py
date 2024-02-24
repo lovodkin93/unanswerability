@@ -14,7 +14,7 @@ from post_processing.pt_to_benchmarks_evaluate_format import main as pt_to_evalu
 # Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)
 
-def get_responses_unanswerable_questions_squad(data_path, p_variant, icl_variant, data_type, args, **kwargs):
+def get_responses_unanswerable_questions_squad(p_variant, icl_variant, data_type, args, **kwargs):
 
     def squad_Passage(full_prompt):
         return full_prompt.split("Passage:")[-1].strip().split("Question:")[0].strip()
@@ -93,7 +93,7 @@ def get_responses_unanswerable_questions_squad(data_path, p_variant, icl_variant
 
     return responses
 
-def get_responses_unanswerable_questions_NQ(data_path, p_variant, icl_variant, data_type, args, **kwargs):
+def get_responses_unanswerable_questions_NQ(p_variant, icl_variant, data_type, args, **kwargs):
 
     def NQ_Passage(full_prompt):
         return full_prompt.split("Passage:")[-1].strip().split("Question:")[0].strip()
@@ -168,7 +168,7 @@ def get_responses_unanswerable_questions_NQ(data_path, p_variant, icl_variant, d
 
     return responses
 
-def get_responses_unanswerable_questions_musique(data_path, p_variant, icl_variant, data_type, args, **kwargs):
+def get_responses_unanswerable_questions_musique(p_variant, icl_variant, data_type, args, **kwargs):
 
     def musique_Context(full_prompt):
         return full_prompt.split("Context:")[-1].strip().split("Question:")[0].strip()
@@ -370,9 +370,7 @@ def main(args):
                             print(f"{curr_outdir} exists! skipping...")
                             continue
 
-                        data_path = fr"data/prompts/{dataset['data_name']}/few_shot/test.json"    
-                        responses = dataset['get_data_function'](data_path=data_path, 
-                                                                 p_variant=p_variant,
+                        responses = dataset['get_data_function'](p_variant=p_variant,
                                                                  icl_variant=icl_variant,
                                                                  data_type=dataset['type'],
                                                                  args=args,

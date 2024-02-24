@@ -1,17 +1,18 @@
 {
     "instructions-Regular-Prompt": "Given the following passage and question, answer the question",
-    "instructions-Hint-Prompt-variant1": "Given the following passage and question, answer the question.\n    If it cannot be answered based on the passage, reply \"unanswerable\"",
-    "instructions-Hint-Prompt-variant2": "Given the following passage and question, answer the question.\n    If you don't know the answer, reply \"IDK\"",
-    "instructions-Hint-Prompt-variant3": "Given the following passage and question, answer the question.\n    If there is no correct answer, reply \"N/A\"",
-    "instructions-CoT-Prompt-variant1": "Given the following passage and question, answer the question.\n    First make sure if it can be answered by the passage.\n    If it cannot be answered based on the passage, reply \"unanswerable\"",
-    "instructions-CoT-Prompt-variant2": "Given the following passage and question, answer the question.\n    First make sure if it can be answered by the passage.\n    If you don't know the answer, reply \"IDK\"",
-    "instructions-CoT-Prompt-variant3": "Given the following passage and question, answer the question.\n    First make sure if it can be answered by the passage.\n    If there is no correct answer, reply \"N/A\"",
+    "instructions-Hint-Prompt": "Given the following passage and question, answer the question.\n {HINT_ADD}",
+    "instructions-CoT-Prompt": "Given the following passage and question, answer the question.\n First make sure if it can be answered by the passage.\n {HINT_ADD}",
     "instructions-Answerability": "Given the following passage and question, decide if the question is answerable based on the passage. Reply only \"answerable\" or \"unanswerable\"",
     "demo_sep": "\n\n",
-    "demo_prompt_zero_shot": "{INST}:\n         Passage: {P} Question: {Q}",
-    "demo_prompt_few_shot": "Instructions: {INST}.\n         Passage: {P} Question: {Q}\n {A}",
+    "demo_prompt_zero_shot": "{INST}:\nPassage: {P}\nQuestion: {Q}",
+    "demo_prompt_few_shot": "Instructions: {INST}.\nPassage: {P}\nQuestion: {Q}\n{A}",
     "non-CoT-format": "Answer: {FIN_A}",
     "CoT-format": "Answer: {CoT} So, the answer is: {FIN_A}",
+    "instructions-Hint-additions": {
+        "variant1": "If it cannot be answered based on the passage, reply \"unanswerable\"",
+        "variant2": "If you don't know the answer, reply \"IDK\"",
+        "variant3": "If there is no correct answer, reply \"N/A\""
+    },
     "no-answer-response": {
         "variant1": "unanswerable",
         "variant2": "IDK",

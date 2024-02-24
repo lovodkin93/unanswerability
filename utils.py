@@ -13,11 +13,9 @@ PROMPT_TYPES = ["Regular-Prompt", "Hint-Prompt", "CoT-Prompt",  "Ablation1", "Ab
 UNANSWERABLE_REPLIES = ["unanswerable", "n/a", "idk", "i don't know", "not known", "answer not in context", "the answer is unknown"]
 UNANSWERABLE_REPLIES_EXACT = ['nan', 'unknown', 'no answer', 'it is unknown', "the answer is unknown", 'none of the above choices', 'none of the above']
 
-def get_instruction(prompt_dict, prompt_type, prompt_variant):
-    if prompt_type in ["Hint-Prompt", "CoT-Prompt", "Hint-Prompt-CoT"]:
-        return prompt_dict[f"instructions-{prompt_type.replace('-CoT', '')}-{prompt_variant}"]
-    elif prompt_type in ["Ablation1", "Ablation1-CoT"]:
-        return prompt_dict[f"instructions-Hint-Prompt-{prompt_variant}"]
+def get_instruction(prompt_dict, prompt_type):
+    if prompt_type in ["Ablation1", "Ablation1-CoT"]:
+        return prompt_dict[f"instructions-Hint-Prompt"]
     elif prompt_type in ["Ablation2", "Ablation2-CoT"]:
         return prompt_dict["instructions-Regular-Prompt"]
     else:
@@ -33,6 +31,7 @@ def get_data_type_instances(raw_data, data_type):
 
 def make_demo(item, prompt, instruction=None, answer_related_prompts=None, test=False):
     prompt = prompt.replace("{INST}", instruction)
+    prompt = prompt.replace("{HINT_ADD}", answer_related_prompts['instructions-Hint-additions'])
     prompt = prompt.replace("{P}", item["Passage"])
     prompt = prompt.replace("{Q}", item["Question"])
     if not test:
@@ -74,11 +73,12 @@ def construct_prompts(prompt_dict : Dict, raw_data: List[Dict], zero_shot: bool,
         updated_instance.update(json.loads(instance['additional_data']))
         for prompt_type in relevant_prompt_types:
             # get relevant instructions (the replace - to also treat the CoT versions in the few-shot setting)
-            instruction = get_instruction(prompt_dict, prompt_type, prompt_variant)
+            instruction = get_instruction(prompt_dict, prompt_type)
            
             head_prompt = ""
             answer_related_prompts = {'answer_format':prompt_dict['CoT-format'] if prompt_type.endswith("CoT") else prompt_dict['non-CoT-format'],
                                       'prompt_suffix':prompt_suffix,
+                                      'instructions-Hint-additions':prompt_dict['instructions-Hint-additions'][prompt_variant],
                                       'no-answer-response':prompt_dict['no-answer-response'][prompt_variant] if not "Answerability" in prompt_type else 'unanswerable'}
             # Generate the demonstration part (for the few-shot)
             if not zero_shot:
