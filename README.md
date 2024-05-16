@@ -13,10 +13,10 @@ conda activate unanswerability_env
 # Download Dataset
 1. To download the dataset, run:
 ```
-wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1GvQhh9KK0P9cDB5XaABlMIXADcL0ChjO' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1GvQhh9KK0P9cDB5XaABlMIXADcL0ChjO" -O data.zip && rm -rf /tmp/cookies.txt
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1q-6FIEGufKVBE3s6OdFoLWL2iHQPJh8h' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1q-6FIEGufKVBE3s6OdFoLWL2iHQPJh8h" -O data.zip && rm -rf /tmp/cookies.txt
 
 ```
-or directly download the file from [Google Drive](https://drive.google.com/file/d/1GvQhh9KK0P9cDB5XaABlMIXADcL0ChjO/view?usp=sharing)
+or directly download the file from [Google Drive](https://drive.google.com/file/d/1q-6FIEGufKVBE3s6OdFoLWL2iHQPJh8h/view?usp=sharing)
 
 2. uzip:
 ```
